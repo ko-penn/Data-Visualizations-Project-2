@@ -32,11 +32,6 @@ class LeafletMap {
     vis.stAttr = 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
     //this is the base map layer, where we are showing the map background
-    /*vis.base_layer = L.tileLayer(vis.esriUrl, {
-      id: 'esri-image',
-      attribution: vis.esriAttr,
-      ext: 'png'
-    });*/
     vis.base_layer = L.tileLayer(vis.esriUrl, {
       id: 'esri-image',
       attribution: vis.esriAttr,
@@ -71,7 +66,6 @@ class LeafletMap {
                         .on('mouseover', function(event,d) { //function to add mouseover event
                             d3.select(this).transition() //D3 selects the object we have moused over in order to perform operations on it
                               .duration('150') //how long we are transitioning between the two states (works like keyframes)
-                              .attr("fill", "red") //change the fill
                               .attr('r', 4); //change radius
 
                             //create a tool tip
@@ -95,7 +89,6 @@ class LeafletMap {
                         .on('mouseleave', function() { //function to add mouseover event
                             d3.select(this).transition() //D3 selects the object we have moused over in order to perform operations on it
                               .duration('150') //how long we are transitioning between the two states (works like keyframes)
-                              .attr("fill", "steelblue") //change the fill
                               .attr('r', 3) //change radius
 
                             d3.select('#tooltip').style('opacity', 0);//turn off the tooltip
@@ -129,9 +122,43 @@ class LeafletMap {
     //   desiredMetersForPoint = 100; //or the uncertainty measure... =) 
     //   radiusSize = desiredMetersForPoint / metresPerPixel;
     // }
+
+    let colorfilter = document.getElementById("colorby").value;
+    let colorfunction;
+    if (colorfilter ==="year"){
+      vis.colorScale = d3.scaleSequential().domain(d3.extent(vis.data, d => d.year)).interpolator(d3.interpolateViridis);
+      colorfunction = d => vis.colorScale(d[colorfilter]);
+    }
+    else if (colorfilter === "month"){
+      vis.colorScale = d3.scaleSequential().domain(d3.extent(vis.data, d => d.month)).interpolator(d3.interpolateViridis);
+      colorfunction = d => vis.colorScale(d[colorfilter]);
+    }
+    else if (colorfilter === "totd"){
+      vis.colorScale = d3.scaleSequential().domain([0,3]).interpolator(d3.interpolateViridis);
+      colorfunction = d => vis.colorScale(d[colorfilter]);
+    }
+    else if (colorfilter === "shape"){
+      vis.colorScale = d3.scaleSequential().domain(d3.extent(vis.data, d => d.shape)).interpolator(d3.interpolateViridis);
+      colorfunction = d => vis.colorScale(d[colorfilter]);
+    }
+    else{
+      colorfunction = "steelblue";
+    }
+
+
+    let maptype = document.getElementById("mapimg").value;
+    let mapUrl = maptype+"Url";
+    let mapAttr = maptype+"Attr";
+    vis.base_layer = L.tileLayer(vis[mapUrl], {
+      id: 'esri-image',
+      attribution: vis[mapAttr],
+      ext: 'png'
+    });
+    //not working properly yet
    
    //redraw based on new zoom- need to recalculate on-screen position
     vis.Dots
+      .attr("fill", colorfunction)
       .attr("cx", d => vis.theMap.latLngToLayerPoint([d.latitude,d.longitude]).x)
       .attr("cy", d => vis.theMap.latLngToLayerPoint([d.latitude,d.longitude]).y)
       .attr("r", vis.radiusSize) ;
