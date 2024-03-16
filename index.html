@@ -12,6 +12,7 @@
 
       <link rel="stylesheet" href="css/leaflet.css" />
       <link rel="stylesheet" href="css/style.css" />
+      <link rel="stylesheet" href="css/form.css" />
 
       <!-- Dependencies -->
       <script defer src="js/dependencies/d3.v6.min.js"></script>
@@ -21,20 +22,7 @@
    </head>
    <body>
       <div id="header">
-         <!-- Dynamic header stuff -->
-         <label for="colorby">Color by </label>
-         <select name="colorby" id="colorby">
-            <option value="na" selected></option>
-            <option value="year">year</option>
-            <option value="month">month</option>
-            <option value="totd">time of day</option>
-            <option value="shape">shape</option>
-         </select>
-         <label for="mapimg">Map image </label>
-         <select name="mapimg" id="mapimg">
-            <option value1="esri" selected>esri</option>
-            <option value1="topo">topo</option>
-         </select>
+         <form id="header-form"></form>
       </div>
       <div id="charts">
          <!-- All charts should be rendered in side this div. We can put scroll or translate the div to put certain charts in view -->

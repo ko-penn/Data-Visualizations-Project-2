@@ -1,4 +1,5 @@
 import { LeafletMap } from './charts/index.mjs';
+import { HeaderFormBuilder } from './helpers/index.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
    main();
@@ -6,14 +7,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function main() {
    rawData = await d3.csv('data/ufo_sightings.csv');
+
+   // TODO: this should be removed, only added to speed up development since lots of dots get laggy
+   rawData = rawData.slice(0, 2000);
+
+   formBuilder = new HeaderFormBuilder();
+
    processData();
    initializeCharts();
 }
 
 function processData() {
-   let shapes = [];
-   let totdconversion = ['night', 'morning', 'afternoon', 'evening'];
-
    data = rawData.map((d) => {
       if (d.latitude !== undefined) {
          d.latitude = +d.latitude; //make sure these are not strings
@@ -22,28 +26,19 @@ function processData() {
          d.longitude = +d.longitude; //make sure these are not strings
       }
 
-      let n = d.date_time.indexOf('/', d.date_time.indexOf('/') + 1) + 1;
-      d.year = d.date_time.slice(n, n + 4);
-      n = d.date_time.indexOf('/');
-      d.month = d.date_time.slice(0, n);
-      n = d.date_time.indexOf(' ') + 1;
-      let n2 = d.date_time.indexOf(':');
-      let hour = +d.date_time.slice(n, n2);
-      if (hour <= 5 || hour >= 21) {
-         d.totd = 0;
-      } else if (hour >= 6 && hour <= 11) {
-         d.totd = 1;
-      } else if (hour >= 12 && hour <= 17) {
-         d.totd = 2;
-      } else if (hour >= 18 && hour <= 20) {
-         d.totd = 3;
-      }
+      d.date_time = new Date(d.date_time);
+      d.year = d.date_time.getYear();
+      d.month = d.date_time.getMonth();
+      d.hour = d.date_time.getHours();
 
-      if (shapes.includes(d.ufo_shape)) {
-         d.shape = shapes.indexOf(d.ufo_shape);
-      } else {
-         shapes.push(d.ufo_shape);
-         d.shape = shapes.length - 1;
+      if (d.hour <= 5 || d.hour >= 21) {
+         d.totd = timeOfTheDay['night'];
+      } else if (d.hour >= 6 && d.hour <= 11) {
+         d.totd = timeOfTheDay['morning'];
+      } else if (d.hour >= 12 && d.hour <= 17) {
+         d.totd = timeOfTheDay['afternoon'];
+      } else if (d.hour >= 18 && d.hour <= 20) {
+         d.totd = timeOfTheDay['evening'];
       }
 
       return d;
@@ -80,11 +75,3 @@ function initializeCharts() {
      voluptate explicabo dolor enim deserunt! Sunt.`;
    document.getElementById('charts').append(d);
 }
-
-document.getElementById('colorby').onchange = function () {
-   map.updateVis();
-};
-
-document.getElementById('mapimg').onchange = function () {
-   map.updateVis();
-};

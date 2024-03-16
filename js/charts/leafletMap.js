@@ -10,7 +10,6 @@ export class LeafletMap {
       this.initVis();
 
       window.addEventListener('resize', () => {
-         this.setWidthAndHeight();
          this.updateVis();
       });
    }
@@ -57,9 +56,8 @@ export class LeafletMap {
       this.mainDiv
          .style('overflow-x', 'hidden')
          .style('margin', this.config.margin);
-      this.setWidthAndHeight();
 
-      this.theMap = L.map(this.config.id, {
+      this.map = L.map(this.config.id, {
          center: [30, 0],
          zoom: 2,
          layers: [this.base_layer],
@@ -68,8 +66,8 @@ export class LeafletMap {
       //if you stopped here, you would just have a map
 
       //initialize svg for d3 to add to map
-      L.svg({ clickable: true }).addTo(this.theMap); // we have to make the svg layer clickable
-      this.overlay = d3.select(this.theMap.getPanes().overlayPane);
+      L.svg({ clickable: true }).addTo(this.map); // we have to make the svg layer clickable
+      this.overlay = d3.select(this.map.getPanes().overlayPane);
       this.svg = this.overlay.select('svg').attr('pointer-events', 'auto');
 
       //these are the city locations, displayed as a set of dots
@@ -86,11 +84,11 @@ export class LeafletMap {
          //Finally, the returned conversion produces an x and y point. We have to select the the desired one using .x or .y
          .attr(
             'cx',
-            (d) => this.theMap.latLngToLayerPoint([d.latitude, d.longitude]).x
+            (d) => this.map.latLngToLayerPoint([d.latitude, d.longitude]).x
          )
          .attr(
             'cy',
-            (d) => this.theMap.latLngToLayerPoint([d.latitude, d.longitude]).y
+            (d) => this.map.latLngToLayerPoint([d.latitude, d.longitude]).y
          )
          .attr('r', 3)
          .on('mouseover', function (event, d) {
@@ -128,14 +126,14 @@ export class LeafletMap {
          })
          .on('click', (event, d) => {
             //experimental feature I was trying- click on point and then fly to it
-            //this.newZoom =this.theMap.getZoom()+2;
+            //this.newZoom =this.map.getZoom()+2;
             // if(this.newZoom > 18)
             // this.newZoom = 18;
-            //this.theMap.flyTo([d.latitude, d.longitude],this.newZoom);
+            //this.map.flyTo([d.latitude, d.longitude],this.newZoom);
          });
 
       //handler here for updating the map, as you zoom in and out
-      this.theMap.on('zoomend', () => {
+      this.map.on('zoomend', () => {
          this.updateVis();
       });
    }
@@ -147,80 +145,63 @@ export class LeafletMap {
       //want to control the size of the radius to be a certain number of meters?
       this.radiusSize = 3;
 
-      // if(this.theMap.getZoom > 15 ){
+      // if(this.map.getZoom > 15 ){
       //   metresPerPixel = 40075016.686 * Math.abs(Math.cos(map.getCenter().lat * Math.PI/180)) / Math.pow(2, map.getZoom()+8);
       //   desiredMetersForPoint = 100; //or the uncertainty measure... =)
       //   radiusSize = desiredMetersForPoint / metresPerPixel;
       // }
 
-      let colorfilter = document.getElementById('colorby').value;
       let colorfunction;
-      if (colorfilter === 'year') {
+      if (formData.colorBy === 'year') {
          this.colorScale = d3
             .scaleSequential()
             .domain(d3.extent(this.data, (d) => d.year))
             .interpolator(d3.interpolateViridis);
-         colorfunction = (d) => this.colorScale(d[colorfilter]);
-      } else if (colorfilter === 'month') {
+      } else if (formData.colorBy === 'month') {
          this.colorScale = d3
             .scaleSequential()
             .domain(d3.extent(this.data, (d) => d.month))
             .interpolator(d3.interpolateViridis);
-         colorfunction = (d) => this.colorScale(d[colorfilter]);
-      } else if (colorfilter === 'totd') {
-         this.colorScale = d3
-            .scaleSequential()
-            .domain([0, 3])
-            .interpolator(d3.interpolateViridis);
-         colorfunction = (d) => this.colorScale(d[colorfilter]);
-      } else if (colorfilter === 'shape') {
-         this.colorScale = d3
-            .scaleSequential()
-            .domain(d3.extent(this.data, (d) => d.shape))
-            .interpolator(d3.interpolateViridis);
-         colorfunction = (d) => this.colorScale(d[colorfilter]);
+      } else if (formData.colorBy === 'totd') {
+         this.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+      } else if (formData.colorBy === 'ufo_shape') {
+         this.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
       } else {
-         colorfunction = 'steelblue';
+         this.colorScale = d3.scaleOrdinal(['steelblue']);
+      }
+      colorfunction = (d) => this.colorScale(d[formData.colorBy]);
+
+      let url = this.esriUrl;
+      let attr = this.esriAttr;
+      if (formData.mapImage === 'topo') {
+         url = this.topoUrl;
+         attr = this.topoAttr;
       }
 
-      let maptype = document.getElementById('mapimg').value;
-      let mapUrl = maptype + 'Url';
-      let mapAttr = maptype + 'Attr';
-      this.base_layer = L.tileLayer(this[mapUrl], {
-         id: 'esri-image',
-         attribution: this[mapAttr],
-         ext: 'png',
-      });
-      //not working properly yet
+      if (
+         url !== this.base_layer._url ||
+         attr !== this.base_layer.options.attribution
+      ) {
+         this.map.removeLayer(this.base_layer);
+         this.base_layer = L.tileLayer(url, {
+            id: 'esri-image',
+            attribution: attr,
+            ext: 'png',
+         });
+         this.map.addLayer(this.base_layer);
+      }
 
       //redraw based on new zoom- need to recalculate on-screen position
       this.dots
          .attr('fill', colorfunction)
          .attr(
             'cx',
-            (d) => this.theMap.latLngToLayerPoint([d.latitude, d.longitude]).x
+            (d) => this.map.latLngToLayerPoint([d.latitude, d.longitude]).x
          )
          .attr(
             'cy',
-            (d) => this.theMap.latLngToLayerPoint([d.latitude, d.longitude]).y
+            (d) => this.map.latLngToLayerPoint([d.latitude, d.longitude]).y
          )
          .attr('r', this.radiusSize);
-   }
-
-   // Calculate and set chart to fill full size of container
-   setWidthAndHeight() {
-      if (this.mainDiv) {
-         const elm = document.getElementById(this.config.id);
-         let { width } = this.config.parentElement.getBoundingClientRect();
-
-         // Wait one frame so scroll can be placed on container if other added items cause overflow
-         requestAnimationFrame(() => {
-            if (hasVerticalScroll(this.config.parentElement)) {
-               width -= getScrollBarWidth(this.config.parentElement);
-            }
-            elm.style.width = `calc(${width}px - 2 * ${this.config.margin})`;
-            this.svg?.attr('width', width);
-         });
-      }
    }
 }

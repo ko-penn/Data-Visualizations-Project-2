@@ -1,4 +1,5 @@
 import { LeafletMap } from './charts/index.mjs';
+import { HeaderFormBuilder } from './index.mjs';
 
 // ---------- Data variables ----------
 
@@ -12,6 +13,38 @@ globalThis.rawData = null;
  * This should have the correct type castings and extra calculated fields built from rawData
  */
 globalThis.data = null;
+
+// ---------- Mapping variables ----------
+globalThis.timeOfTheDay = {
+   night: 'Night',
+   morning: 'Morning',
+   afternoon: 'Afternoon',
+   evening: 'Evening',
+};
+
+// ---------- Form variables ----------
+globalThis.colorBy = {
+   year: 'Year',
+   month: 'Month',
+   totd: 'Time of the day',
+   ufo_shape: 'Shape',
+};
+
+globalThis.mapImage = {
+   esri: 'Esri',
+   topo: 'Topo',
+};
+
+globalThis.formData = {
+   colorBy: 'year' ?? null,
+   mapImage: 'esri' ?? null,
+};
+
+/**
+ * @type {(HeaderFormBuilder | null)}
+ * Object for header form build instance
+ */
+globalThis.formBuilder = null;
 
 // ---------- Chart variables ----------
 
