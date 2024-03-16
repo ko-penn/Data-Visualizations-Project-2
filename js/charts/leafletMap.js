@@ -37,11 +37,6 @@ export class LeafletMap {
          'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
       //this is the base map layer, where we are showing the map background
-      /*vis.base_layer = L.tileLayer(vis.esriUrl, {
-      id: 'esri-image',
-      attribution: vis.esriAttr,
-      ext: 'png'
-    });*/
       this.base_layer = L.tileLayer(this.esriUrl, {
          id: 'esri-image',
          attribution: this.esriAttr,
@@ -103,7 +98,6 @@ export class LeafletMap {
             d3.select(this)
                .transition() //D3 selects the object we have moused over in order to perform operations on it
                .duration('150') //how long we are transitioning between the two states (works like keyframes)
-               .attr('fill', 'red') //change the fill
                .attr('r', 4); //change radius
 
             //create a tool tip
@@ -128,7 +122,6 @@ export class LeafletMap {
             d3.select(this)
                .transition() //D3 selects the object we have moused over in order to perform operations on it
                .duration('150') //how long we are transitioning between the two states (works like keyframes)
-               .attr('fill', 'steelblue') //change the fill
                .attr('r', 3); //change radius
 
             d3.select('#tooltip').style('opacity', 0); //turn off the tooltip
@@ -160,8 +153,49 @@ export class LeafletMap {
       //   radiusSize = desiredMetersForPoint / metresPerPixel;
       // }
 
+      let colorfilter = document.getElementById('colorby').value;
+      let colorfunction;
+      if (colorfilter === 'year') {
+         this.colorScale = d3
+            .scaleSequential()
+            .domain(d3.extent(this.data, (d) => d.year))
+            .interpolator(d3.interpolateViridis);
+         colorfunction = (d) => this.colorScale(d[colorfilter]);
+      } else if (colorfilter === 'month') {
+         this.colorScale = d3
+            .scaleSequential()
+            .domain(d3.extent(this.data, (d) => d.month))
+            .interpolator(d3.interpolateViridis);
+         colorfunction = (d) => this.colorScale(d[colorfilter]);
+      } else if (colorfilter === 'totd') {
+         this.colorScale = d3
+            .scaleSequential()
+            .domain([0, 3])
+            .interpolator(d3.interpolateViridis);
+         colorfunction = (d) => this.colorScale(d[colorfilter]);
+      } else if (colorfilter === 'shape') {
+         this.colorScale = d3
+            .scaleSequential()
+            .domain(d3.extent(this.data, (d) => d.shape))
+            .interpolator(d3.interpolateViridis);
+         colorfunction = (d) => this.colorScale(d[colorfilter]);
+      } else {
+         colorfunction = 'steelblue';
+      }
+
+      let maptype = document.getElementById('mapimg').value;
+      let mapUrl = maptype + 'Url';
+      let mapAttr = maptype + 'Attr';
+      this.base_layer = L.tileLayer(this[mapUrl], {
+         id: 'esri-image',
+         attribution: this[mapAttr],
+         ext: 'png',
+      });
+      //not working properly yet
+
       //redraw based on new zoom- need to recalculate on-screen position
       this.dots
+         .attr('fill', colorfunction)
          .attr(
             'cx',
             (d) => this.theMap.latLngToLayerPoint([d.latitude, d.longitude]).x
