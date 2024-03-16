@@ -20,6 +20,12 @@ body {
    overflow-x: hidden;
 }
 
+#header,
+#timeline {
+   padding: 1em;
+   background-color: #ebebeb;
+}
+
 #tooltip {
    position: absolute;
    opacity: 0;
