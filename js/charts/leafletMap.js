@@ -18,27 +18,11 @@ export class LeafletMap {
     * We initialize scales/axes and append static elements, such as axis titles.
     */
    initVis() {
-      //ESRI
-      this.esriUrl =
-         'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
-      this.esriAttr =
-         'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
-
-      //TOPO
-      this.topoUrl = 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png';
-      this.topoAttr =
-         'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)';
-
-      //Stamen Terrain
-      this.stUrl =
-         'https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.{ext}';
-      this.stAttr =
-         'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
-
       //this is the base map layer, where we are showing the map background
-      this.base_layer = L.tileLayer(this.esriUrl, {
+      const mapLayer = mapLayerUrls[formData.mapImage];
+      this.base_layer = L.tileLayer(mapLayer.url, {
          id: 'esri-image',
-         attribution: this.esriAttr,
+         attribution: mapLayer.attr,
          ext: 'png',
       });
 
@@ -171,20 +155,14 @@ export class LeafletMap {
       }
       colorfunction = (d) => this.colorScale(d[formData.colorBy]);
 
-      let url = this.esriUrl;
-      let attr = this.esriAttr;
-      if (formData.mapImage === 'topo') {
-         url = this.topoUrl;
-         attr = this.topoAttr;
-      }
-
+      const { url, attr } = mapLayerUrls[formData.mapImage];
       if (
          url !== this.base_layer._url ||
          attr !== this.base_layer.options.attribution
       ) {
          this.map.removeLayer(this.base_layer);
          this.base_layer = L.tileLayer(url, {
-            id: 'esri-image',
+            id: 'base-image',
             attribution: attr,
             ext: 'png',
          });
