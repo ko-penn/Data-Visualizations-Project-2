@@ -1,0 +1,27 @@
+#header-form {
+   display: flex;
+   justify-content: flex-start;
+   align-items: center;
+
+   .select-container {
+      min-width: 10em;
+      margin-right: 1em;
+
+      label {
+         display: block;
+         font-weight: bold;
+         font-size: small;
+      }
+      select {
+         display: block;
+         width: 100%;
+         padding: 0.5em;
+         border: 1px solid #d1d1d1;
+         border-radius: 0.25em;
+      }
+
+      input {
+         width: 100%;
+      }
+   }
+}
