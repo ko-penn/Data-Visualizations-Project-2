@@ -1,36 +1,51 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Interactive map with Leaflet</title>
-    <link rel="icon" href="data:;base64,iVBORwOKGO=" />
-    <link rel="stylesheet" href="css/leaflet.css">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body>
-    <label for="colorby">Color by </label>
-    <select name="colorby" id="colorby">
-        <option value="na" selected></option>
-        <option value="year">year</option>
-        <option value="month">month</option>
-        <option value="totd">day</option>
-        <option value="shape">shape</option>
-    </select>
-    <label for="mapimg">Map image </label>
-    <select name="mapimg" id="mapimg">
-        <option value1="esri" selected>esri</option>
-        <option value1="topo">topo</option>
-    </select>
-    <div id="my-map"></div>
-    
-    <script src="js/d3.v6.min.js"></script>
-    <script src="js/leaflet.js"></script>
+   <head>
+      <title>Interactive map with Leaflet</title>
+      <link rel="icon" href="data:;base64,iVBORwOKGO=" />
+      <link rel="preconnect" href="https://fonts.googleapis.com" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+      <link
+         href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+         rel="stylesheet"
+      />
 
+      <link rel="stylesheet" href="css/leaflet.css" />
+      <link rel="stylesheet" href="css/style.css" />
 
-    <script src="js/main.js"></script>
-    <script src="js/leafletMap.js"></script>
+      <!-- Dependencies -->
+      <script defer src="js/dependencies/d3.v6.min.js"></script>
+      <script defer src="js/dependencies/leaflet.js"></script>
 
-    <div id="tooltip"></div>
+      <script type="module" defer src="js/index.mjs"></script>
+   </head>
+   <body>
+      <div id="header">
+         <!-- Dynamic header stuff -->
+         Header test
+      </div>
+      <div id="charts">
+         <!-- All charts should be rendered in side this div. We can put scroll or translate the div to put certain charts in view -->
+      </div>
+      <div id="timeline">
+         <!-- Dynamically build this based on the datas min and max datetimes -->
+         timeline test
+      </div>
 
-
-</body>
+      <!-- <label for="colorby">Color by </label>
+      <select name="colorby" id="colorby">
+         <option value="na" selected></option>
+         <option value="year">year</option>
+         <option value="month">month</option>
+         <option value="totd">day</option>
+         <option value="shape">shape</option>
+      </select>
+      <label for="mapimg">Map image </label>
+      <select name="mapimg" id="mapimg">
+         <option value1="esri" selected>esri</option>
+         <option value1="topo">topo</option>
+      </select> -->
+      <!-- <div id="my-map"></div> -->
+      <div id="tooltip"></div>
+   </body>
 </html>
