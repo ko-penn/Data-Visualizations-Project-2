@@ -12,6 +12,19 @@ body {
    flex-direction: column;
 }
 
+button {
+   outline: none;
+   padding: 1em;
+   cursor: pointer;
+   border: none;
+   transition: 0.3s;
+   border-radius: 0.25em;
+   background-color: white;
+}
+button:hover {
+   background-color: rgb(212, 212, 212);
+}
+
 #charts {
    flex-grow: 1;
    display: grid;
@@ -20,10 +33,59 @@ body {
    overflow-x: hidden;
 }
 
-#header,
-#timeline {
+#header {
    padding: 1em;
    background-color: #ebebeb;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   #info {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1em;
+      cursor: pointer;
+      outline: none;
+      border: none;
+      transition: 0.3s;
+   }
+   #info:hover {
+      background-color: rgb(56, 56, 56);
+   }
+}
+
+.timeline-wrapper {
+   padding: 1em;
+   background-color: #ebebeb;
+   display: flex;
+   /* flex-direction: column; */
+   justify-content: space-between;
+   align-items: center;
+
+   #timeline-controls {
+      display: flex;
+      justify-content: flex-end;
+      align-items: flex-end;
+      width: max-content;
+
+      .buttons {
+         margin-right: 1em;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         button {
+            border: 1px solid #ebebeb;
+         }
+         button:first-child {
+            border-right: 0px;
+         }
+      }
+   }
 }
 
 #tooltip {

@@ -10,7 +10,13 @@ globalThis.rawData = null;
 
 /**
  * The processed raw data.
- * This should have the correct type castings and extra calculated fields built from rawData
+ * This should have the correct type castings and extra calculated fields built from rawData.
+ * Its also what is used to build the data object with the correct filtering, grouping, etc...
+ */
+globalThis.processedData = null;
+
+/**
+ * The processed, filtered, and aggregated processedData.
  */
 globalThis.data = null;
 
@@ -51,10 +57,25 @@ globalThis.mapImage = {
    geo: 'Geo',
 };
 
-globalThis.formData = {
-   colorBy: 'year' ?? null,
-   mapImage: 'esri' ?? null,
+globalThis.timelineSpeeds = {
+   extraSlow: '0.25x speed',
+   slow: '0.5x speed',
+   normal: 'Normal speed',
+   fast: '2x speed',
+   fastest: '5x speed',
 };
+
+globalThis.formData = {
+   colorBy: 'year',
+   mapImage: 'esri',
+};
+
+// ---------- Builder Variables----------
+/**
+ * @type {(TimelineBuilder | null)}
+ * Object for header form build instance
+ */
+globalThis.timelineBuilder = null;
 
 /**
  * @type {(HeaderFormBuilder | null)}
@@ -103,4 +124,44 @@ globalThis.getScrollBarWidth = (element) => {
  */
 globalThis.hasVerticalScroll = (element) => {
    return element.scrollHeight > element.clientHeight;
+};
+
+/**
+ * Updates all global instances of all visualizations
+ */
+globalThis.updateAllVis = (dataChange) => {
+   if (dataChange) {
+      map?.updateData(data);
+   } else {
+      // TODO: update other visualizations when form changes
+      map?.updateVis();
+   }
+};
+
+/**
+ * Creates a select dropdown from keys/value pairs passed in
+ */
+globalThis.createSelect = (object, label, keysToExclude = []) => {
+   const keys = Object.keys(object).filter((a) => !keysToExclude.includes(a));
+
+   const container = document.createElement('div');
+   container.classList.add('select-container');
+   container.id = label.split(' ').join('');
+
+   const selectElm = document.createElement('select');
+   keys.forEach((k) => {
+      const option = document.createElement('option');
+      option.value = k;
+      option.innerText = object[k];
+      selectElm.append(option);
+   });
+   selectElm.name = label;
+
+   const labelElm = document.createElement('label');
+   labelElm.for = label;
+   labelElm.innerText = label;
+
+   container.append(labelElm);
+   container.append(selectElm);
+   return container;
 };

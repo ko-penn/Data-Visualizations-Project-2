@@ -19,17 +19,31 @@
       <script defer src="js/dependencies/leaflet.js"></script>
 
       <script type="module" defer src="js/index.mjs"></script>
+      <script
+         src="https://kit.fontawesome.com/ce1e161f8c.js"
+         crossorigin="anonymous"
+      ></script>
    </head>
    <body>
       <div id="header">
-         <form id="header-form"></form>
+         <div class="lhs">
+            <form id="header-form"></form>
+         </div>
+
+         <div class="rhs">
+            <button id="info">
+               <i class="fas fa-info"></i>
+            </button>
+         </div>
       </div>
       <div id="charts">
          <!-- All charts should be rendered in side this div. We can put scroll or translate the div to put certain charts in view -->
       </div>
-      <div id="timeline">
-         <!-- Dynamically build this based on the datas min and max datetimes -->
-         timeline test
+      <div class="timeline-wrapper">
+         <svg id="timeline" width="100%" height="100%">
+            <!-- Dynamically build this based on the datas min and max datetimes -->
+         </svg>
+         <div id="timeline-controls"></div>
       </div>
 
       <div id="tooltip"></div>
