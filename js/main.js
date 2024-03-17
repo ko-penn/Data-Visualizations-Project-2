@@ -15,9 +15,7 @@ async function main() {
    initializeBuilders();
    initializeCharts();
 
-   document
-      .getElementById('info')
-      .addEventListener('click', openProjectInformation);
+   initializeEventListeners();
 }
 
 function processData() {
@@ -91,4 +89,10 @@ function initializeBuilders() {
 function openProjectInformation() {
    // TODO
    alert('Open a dialog with information about the project');
+}
+
+function initializeEventListeners() {
+   document
+      .getElementById('info')
+      .addEventListener('click', openProjectInformation);
 }

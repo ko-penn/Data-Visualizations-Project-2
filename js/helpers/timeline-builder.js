@@ -11,6 +11,7 @@ export class TimelineBuilder {
       this.config.parentElement.parentNode.addEventListener('click', () => {
          this.chart.call(this.brush.move, null);
          this.selectedYears = null;
+         this.pause();
          this.updateVis();
          this.triggerDataUpdate();
       });
@@ -21,6 +22,8 @@ export class TimelineBuilder {
    }
 
    initVis() {
+      this.handleTimelineControls();
+
       this.setWidthAndHeight();
 
       const years = this.data.map((d) => d.year);
@@ -131,6 +134,55 @@ export class TimelineBuilder {
       this.yAxisG.call(this.yAxis);
    }
 
+   play() {
+      if (this.playInterval) {
+         clearInterval(this.playInterval);
+      }
+
+      const baseSpeed = 1000;
+      let speed = baseSpeed;
+      if (this.timelineSpeed === 'extraSlow') {
+         speed = baseSpeed + baseSpeed * 0.25;
+      } else if (this.timelineSpeed === 'slow') {
+         speed = baseSpeed + baseSpeed * 0.5;
+      } else if (this.timelineSpeed === 'fast') {
+         speed = baseSpeed / 2;
+      } else if (this.timelineSpeed === 'fastest') {
+         speed = baseSpeed / 5;
+      }
+
+      const moveSelection1Year = (minYearInSelection) => {
+         const maxYear = Math.max(...this.data.map((d) => d.year));
+
+         if (minYearInSelection === maxYear) {
+            clearInterval(this.playInterval);
+            return;
+         }
+
+         this.selection = this.snappedSelection(this.xScale, [
+            minYearInSelection + 1,
+         ]);
+         this.chart.call(this.brush.move, this.selection);
+         this.triggerDataUpdate();
+         this.updateVis();
+      };
+
+      const minYearInSelection =
+         Math.min(...(this.selectedYears ?? this.data.map((d) => d.year))) - 1;
+      moveSelection1Year(minYearInSelection);
+
+      this.playInterval = setInterval(() => {
+         const minYearInSelection = Math.min(
+            ...(this.selectedYears ?? this.data.map((d) => d.year))
+         );
+         moveSelection1Year(minYearInSelection);
+      }, speed);
+   }
+
+   pause() {
+      clearInterval(this.playInterval);
+   }
+
    brushing(event) {
       if (!event.selection && !event.sourceEvent) return;
 
@@ -209,5 +261,49 @@ export class TimelineBuilder {
          (d) => !this.selectedYears || this.selectedYears.includes(`${d.year}`)
       );
       updateAllVis(JSON.stringify(data) !== JSON.stringify(preData));
+   }
+
+   handleTimelineControls() {
+      const controls = document.getElementById('timeline-controls');
+
+      controls.innerHTML = `
+         <div class="buttons">
+            <button id="play" type="button">
+               <i class="fas fa-play"></i>
+            </button>
+            <button id="pause" type="button">
+               <i class="fas fa-pause"></i>
+            </button>
+         </div>
+      `;
+
+      this.timelineSpeedControl = createSelect(
+         timelineSpeeds,
+         'Timeline Speed'
+      );
+      this.timelineSpeedControl.querySelector('select').value = 'normal';
+      controls.append(this.timelineSpeedControl);
+
+      controls.addEventListener('click', (event) => {
+         // Prevent click propogations from causing brush selection to be cleared
+         event.stopPropagation();
+         event.preventDefault();
+      });
+
+      this.timelineSpeedControl.addEventListener('change', () => {
+         this.timelineSpeed =
+            this.timelineSpeedControl.querySelector('select').value;
+         if (this.playInterval !== undefined) {
+            // Trigger play again to restart with correct speed
+            this.play();
+         }
+      });
+
+      document.getElementById('play').addEventListener('click', (event) => {
+         this.play();
+      });
+      document.getElementById('pause').addEventListener('click', (event) => {
+         this.pause();
+      });
    }
 }

@@ -57,9 +57,17 @@ globalThis.mapImage = {
    geo: 'Geo',
 };
 
+globalThis.timelineSpeeds = {
+   extraSlow: '0.25x speed',
+   slow: '0.5x speed',
+   normal: 'Normal speed',
+   fast: '2x speed',
+   fastest: '5x speed',
+};
+
 globalThis.formData = {
-   colorBy: 'year' ?? null,
-   mapImage: 'esri' ?? null,
+   colorBy: 'year',
+   mapImage: 'esri',
 };
 
 // ---------- Builder Variables----------
@@ -128,4 +136,32 @@ globalThis.updateAllVis = (dataChange) => {
       // TODO: update other visualizations when form changes
       map?.updateVis();
    }
+};
+
+/**
+ * Creates a select dropdown from keys/value pairs passed in
+ */
+globalThis.createSelect = (object, label, keysToExclude = []) => {
+   const keys = Object.keys(object).filter((a) => !keysToExclude.includes(a));
+
+   const container = document.createElement('div');
+   container.classList.add('select-container');
+   container.id = label.split(' ').join('');
+
+   const selectElm = document.createElement('select');
+   keys.forEach((k) => {
+      const option = document.createElement('option');
+      option.value = k;
+      option.innerText = object[k];
+      selectElm.append(option);
+   });
+   selectElm.name = label;
+
+   const labelElm = document.createElement('label');
+   labelElm.for = label;
+   labelElm.innerText = label;
+
+   container.append(labelElm);
+   container.append(selectElm);
+   return container;
 };
