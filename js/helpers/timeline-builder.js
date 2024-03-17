@@ -83,17 +83,13 @@ export class TimelineBuilder {
          .handleSize(8)
          .extent(extent)
          .on('end', (event) => this.brushing(event));
-      // this.chart.call(this.brush);
-      const firstYearSelection = [0, this.xScale.bandwidth()];
       this.chart.call(this.brush);
-      this.chart.call(this.brush.move, firstYearSelection);
-      this.selectYearsFromBrush(
-         firstYearSelection[0],
-         firstYearSelection[1],
-         true
-      );
 
       this.updateVis();
+
+      this.selection = this.snappedSelection(this.xScale, [minYear]);
+      this.chart.call(this.brush.move, this.selection);
+      this.triggerDataUpdate();
    }
 
    updateVis() {
