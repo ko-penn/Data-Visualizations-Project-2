@@ -31,8 +31,7 @@ export class HeaderFormBuilder {
       formData.colorBy = colorByValue;
       formData.mapImage = mapImageValue;
 
-      // TODO: update other visualizations when form changes
-      map?.updateVis();
+      updateAllVis();
    }
 
    appendColorBy() {

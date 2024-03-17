@@ -20,10 +20,38 @@ body {
    overflow-x: hidden;
 }
 
-#header,
-#timeline {
+#header {
    padding: 1em;
    background-color: #ebebeb;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   #info {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: black;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1em;
+      cursor: pointer;
+      outline: none;
+      border: none;
+      transition: 0.3s;
+   }
+   #info:hover {
+      background-color: rgb(56, 56, 56);
+   }
+}
+
+.timeline-wrapper {
+   padding: 1em;
+   background-color: #ebebeb;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
 }
 
 #tooltip {

@@ -10,7 +10,13 @@ globalThis.rawData = null;
 
 /**
  * The processed raw data.
- * This should have the correct type castings and extra calculated fields built from rawData
+ * This should have the correct type castings and extra calculated fields built from rawData.
+ * Its also what is used to build the data object with the correct filtering, grouping, etc...
+ */
+globalThis.processedData = null;
+
+/**
+ * The processed, filtered, and aggregated processedData.
  */
 globalThis.data = null;
 
@@ -55,6 +61,13 @@ globalThis.formData = {
    colorBy: 'year' ?? null,
    mapImage: 'esri' ?? null,
 };
+
+// ---------- Builder Variables----------
+/**
+ * @type {(TimelineBuilder | null)}
+ * Object for header form build instance
+ */
+globalThis.timelineBuilder = null;
 
 /**
  * @type {(HeaderFormBuilder | null)}
@@ -103,4 +116,16 @@ globalThis.getScrollBarWidth = (element) => {
  */
 globalThis.hasVerticalScroll = (element) => {
    return element.scrollHeight > element.clientHeight;
+};
+
+/**
+ * Updates all global instances of all visualizations
+ */
+globalThis.updateAllVis = (dataChange) => {
+   if (dataChange) {
+      map?.updateData(data);
+   } else {
+      // TODO: update other visualizations when form changes
+      map?.updateVis();
+   }
 };

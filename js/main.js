@@ -1,5 +1,5 @@
 import { LeafletMap } from './charts/index.mjs';
-import { HeaderFormBuilder } from './helpers/index.mjs';
+import { HeaderFormBuilder, TimelineBuilder } from './helpers/index.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
    main();
@@ -9,16 +9,19 @@ async function main() {
    rawData = await d3.csv('data/ufo_sightings.csv');
 
    // TODO: this should be removed, only added to speed up development since lots of dots get laggy
-   rawData = rawData.slice(0, 2000);
-
-   formBuilder = new HeaderFormBuilder();
+   // rawData = rawData.slice(0, 2000);
 
    processData();
+   initializeBuilders();
    initializeCharts();
+
+   document
+      .getElementById('info')
+      .addEventListener('click', openProjectInformation);
 }
 
 function processData() {
-   data = rawData.map((d) => {
+   processedData = rawData.map((d) => {
       if (d.latitude !== undefined) {
          d.latitude = +d.latitude; //make sure these are not strings
       }
@@ -27,7 +30,7 @@ function processData() {
       }
 
       d.date_time = new Date(d.date_time);
-      d.year = d.date_time.getYear();
+      d.year = d.date_time.getFullYear();
       d.month = d.date_time.getMonth();
       d.hour = d.date_time.getHours();
 
@@ -43,6 +46,7 @@ function processData() {
 
       return d;
    });
+   data = processedData;
 }
 
 function initializeCharts() {
@@ -74,4 +78,17 @@ function initializeCharts() {
      voluptas, iste esse illum eius aperiam magni atque eum voluptatem ullam
      voluptate explicabo dolor enim deserunt! Sunt.`;
    document.getElementById('charts').append(d);
+}
+
+function initializeBuilders() {
+   formBuilder = new HeaderFormBuilder();
+   timelineBuilder = new TimelineBuilder(
+      { parentElementSelector: '#timeline' },
+      data
+   );
+}
+
+function openProjectInformation() {
+   // TODO
+   alert('Open a dialog with information about the project');
 }

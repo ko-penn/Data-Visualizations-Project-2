@@ -54,6 +54,57 @@ export class LeafletMap {
       this.overlay = d3.select(this.map.getPanes().overlayPane);
       this.svg = this.overlay.select('svg').attr('pointer-events', 'auto');
 
+      //handler here for updating the map, as you zoom in and out
+      this.map.on('zoomend', () => {
+         this.updateVis();
+      });
+   }
+
+   updateVis() {
+      //want to see how zoomed in you are?
+      // console.log(vis.map.getZoom()); //how zoomed am I
+
+      //want to control the size of the radius to be a certain number of meters?
+      this.radiusSize = 3;
+
+      // if(this.map.getZoom > 15 ){
+      //   metresPerPixel = 40075016.686 * Math.abs(Math.cos(map.getCenter().lat * Math.PI/180)) / Math.pow(2, map.getZoom()+8);
+      //   desiredMetersForPoint = 100; //or the uncertainty measure... =)
+      //   radiusSize = desiredMetersForPoint / metresPerPixel;
+      // }
+
+      if (formData.colorBy === 'year') {
+         this.colorScale = d3
+            .scaleSequential()
+            .domain(d3.extent(this.data, (d) => d.year))
+            .interpolator(d3.interpolateViridis);
+      } else if (formData.colorBy === 'month') {
+         this.colorScale = d3
+            .scaleSequential()
+            .domain(d3.extent(this.data, (d) => d.month))
+            .interpolator(d3.interpolateViridis);
+      } else if (formData.colorBy === 'totd') {
+         this.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+      } else if (formData.colorBy === 'ufo_shape') {
+         this.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
+      } else {
+         this.colorScale = d3.scaleOrdinal(['steelblue']);
+      }
+
+      const { url, attr } = mapLayerUrls[formData.mapImage];
+      if (
+         url !== this.base_layer._url ||
+         attr !== this.base_layer.options.attribution
+      ) {
+         this.map.removeLayer(this.base_layer);
+         this.base_layer = L.tileLayer(url, {
+            id: 'base-image',
+            attribution: attr,
+            ext: 'png',
+         });
+         this.map.addLayer(this.base_layer);
+      }
+
       //these are the city locations, displayed as a set of dots
       this.dots = this.svg
          .selectAll('circle')
@@ -61,7 +112,7 @@ export class LeafletMap {
             this.data.filter((d) => !isNaN(d.latitude) && !isNaN(d.longitude))
          )
          .join('circle')
-         .attr('fill', 'steelblue')
+         .attr('fill', (d) => this.colorScale(d[formData.colorBy]))
          .attr('stroke', 'black')
          //Leaflet has to take control of projecting points. Here we are feeding the latitude and longitude coordinates to
          //leaflet so that it can project them on the coordinates of the view. Notice, we have to reverse lat and lon.
@@ -74,7 +125,7 @@ export class LeafletMap {
             'cy',
             (d) => this.map.latLngToLayerPoint([d.latitude, d.longitude]).y
          )
-         .attr('r', 3)
+         .attr('r', this.radiusSize)
          .on('mouseover', function (event, d) {
             //function to add mouseover event
             d3.select(this)
@@ -88,10 +139,11 @@ export class LeafletMap {
                .select('#tooltip')
                .style('opacity', 1)
                .style('z-index', 1000000).html(`
-                                  <div>Date Time: ${d.date_time}</div>
-                                  <div>City Area: ${d.city_area}</div>
-                                  <div>Description: ${d.description}</div>
-                                  <div>UFO Shape: ${d.ufo_shape}`);
+                  <div>Date Time: ${d.date_time}</div>
+                  <div>City Area: ${d.city_area}</div>
+                  <div>Description: ${d.description}</div>
+                  <div>UFO Shape: ${d.ufo_shape}
+               `);
          })
          .on('mousemove', (event) => {
             //position the tooltip
@@ -115,71 +167,10 @@ export class LeafletMap {
             // this.newZoom = 18;
             //this.map.flyTo([d.latitude, d.longitude],this.newZoom);
          });
-
-      //handler here for updating the map, as you zoom in and out
-      this.map.on('zoomend', () => {
-         this.updateVis();
-      });
    }
 
-   updateVis() {
-      //want to see how zoomed in you are?
-      // console.log(vis.map.getZoom()); //how zoomed am I
-
-      //want to control the size of the radius to be a certain number of meters?
-      this.radiusSize = 3;
-
-      // if(this.map.getZoom > 15 ){
-      //   metresPerPixel = 40075016.686 * Math.abs(Math.cos(map.getCenter().lat * Math.PI/180)) / Math.pow(2, map.getZoom()+8);
-      //   desiredMetersForPoint = 100; //or the uncertainty measure... =)
-      //   radiusSize = desiredMetersForPoint / metresPerPixel;
-      // }
-
-      let colorfunction;
-      if (formData.colorBy === 'year') {
-         this.colorScale = d3
-            .scaleSequential()
-            .domain(d3.extent(this.data, (d) => d.year))
-            .interpolator(d3.interpolateViridis);
-      } else if (formData.colorBy === 'month') {
-         this.colorScale = d3
-            .scaleSequential()
-            .domain(d3.extent(this.data, (d) => d.month))
-            .interpolator(d3.interpolateViridis);
-      } else if (formData.colorBy === 'totd') {
-         this.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
-      } else if (formData.colorBy === 'ufo_shape') {
-         this.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
-      } else {
-         this.colorScale = d3.scaleOrdinal(['steelblue']);
-      }
-      colorfunction = (d) => this.colorScale(d[formData.colorBy]);
-
-      const { url, attr } = mapLayerUrls[formData.mapImage];
-      if (
-         url !== this.base_layer._url ||
-         attr !== this.base_layer.options.attribution
-      ) {
-         this.map.removeLayer(this.base_layer);
-         this.base_layer = L.tileLayer(url, {
-            id: 'base-image',
-            attribution: attr,
-            ext: 'png',
-         });
-         this.map.addLayer(this.base_layer);
-      }
-
-      //redraw based on new zoom- need to recalculate on-screen position
-      this.dots
-         .attr('fill', colorfunction)
-         .attr(
-            'cx',
-            (d) => this.map.latLngToLayerPoint([d.latitude, d.longitude]).x
-         )
-         .attr(
-            'cy',
-            (d) => this.map.latLngToLayerPoint([d.latitude, d.longitude]).y
-         )
-         .attr('r', this.radiusSize);
+   updateData(data) {
+      this.data = data;
+      this.updateVis();
    }
 }
