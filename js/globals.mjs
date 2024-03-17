@@ -1,4 +1,4 @@
-import { LeafletMap } from './charts/index.mjs';
+import { Bar, LeafletMap } from './charts/index.mjs';
 import { HeaderFormBuilder } from './index.mjs';
 
 // ---------- Data variables ----------
@@ -26,6 +26,16 @@ globalThis.timeOfTheDay = {
    morning: 'Morning',
    afternoon: 'Afternoon',
    evening: 'Evening',
+};
+
+globalThis.shapes = new Set();
+
+globalThis.encounterLengthCategories = {
+   xShort: 'Extremely Short',
+   short: 'Short',
+   average: 'Average',
+   long: 'Long',
+   xLong: 'Extremely Long',
 };
 
 globalThis.mapLayerUrls = {
@@ -68,6 +78,7 @@ globalThis.timelineSpeeds = {
 globalThis.formData = {
    colorBy: 'year',
    mapImage: 'esri',
+   hideYearsWithoutData: false,
 };
 
 // ---------- Builder Variables----------
@@ -90,6 +101,24 @@ globalThis.formBuilder = null;
  * Object for map chart instance
  */
 globalThis.map = null;
+
+/**
+ * @type {(Bar | null)}
+ * Object for time of the day freq bar chart instance
+ */
+globalThis.totdFreqBar = null;
+
+/**
+ * @type {(Bar | null)}
+ * Object for shape freq bar chart instance
+ */
+globalThis.shapeFreqBar = null;
+
+/**
+ * @type {(Bar | null)}
+ * Object for encounter length freq bar chart instance
+ */
+globalThis.encounterLengthFreqBar = null;
 
 // ---------- Helper functions ----------
 
@@ -132,9 +161,15 @@ globalThis.hasVerticalScroll = (element) => {
 globalThis.updateAllVis = (dataChange) => {
    if (dataChange) {
       map?.updateData(data);
+      totdFreqBar?.updateData(data);
+      shapeFreqBar?.updateData(data);
+      encounterLengthFreqBar?.updateData(data);
    } else {
       // TODO: update other visualizations when form changes
       map?.updateVis();
+      totdFreqBar?.updateVis();
+      shapeFreqBar?.updateVis();
+      encounterLengthFreqBar?.updateVis();
    }
 };
 

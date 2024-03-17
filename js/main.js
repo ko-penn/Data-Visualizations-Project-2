@@ -1,4 +1,4 @@
-import { LeafletMap } from './charts/index.mjs';
+import { Bar, LeafletMap } from './charts/index.mjs';
 import { HeaderFormBuilder, TimelineBuilder } from './helpers/index.mjs';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,6 +26,9 @@ function processData() {
       if (d.longitude !== undefined) {
          d.longitude = +d.longitude; //make sure these are not strings
       }
+      if (d.encounter_length !== undefined) {
+         d.encounter_length = +d.encounter_length; //make sure these are not strings
+      }
 
       d.date_time = new Date(d.date_time);
       d.year = d.date_time.getFullYear();
@@ -42,6 +45,8 @@ function processData() {
          d.totd = timeOfTheDay['evening'];
       }
 
+      shapes.add(d.ufo_shape);
+
       return d;
    });
    data = processedData;
@@ -50,32 +55,44 @@ function processData() {
 function initializeCharts() {
    map = new LeafletMap(
       {
-         parentElementSelector: '#charts',
+         parentElementSelector: '#map-chart-container',
          id: 'my-map',
-         margin: '2em',
       },
       data
    );
 
    // Build bar charts
+   const barChartsContainerSelector = '#bar-charts-container';
+   totdFreqBar = new Bar(
+      {
+         parentElementSelector: barChartsContainerSelector,
+         id: 'totd',
+         key: 'totd',
+      },
+      data
+   );
+   shapeFreqBar = new Bar(
+      {
+         parentElementSelector: barChartsContainerSelector,
+         id: 'shape',
+         key: 'ufo_shape',
+      },
+      data
+   );
+
+   // Build Histograms
+   // encounterLengthFreqBar = new Bar(
+   //    {
+   //       parentElementSelector: barChartsContainerSelector,
+   //       id: 'length',
+   //       key: 'encounter_length',
+   //    },
+   //    data
+   // );
 
    // Build scatter plot charts
 
    // Build word cloud
-
-   // TODO: remove this, just testing scrolling is working
-   const d = document.createElement('div');
-   d.innerText = `l;Lorem ipsum dolor sit amet consectetur adipisicing elit. Aliquid,
-     dignissimos. Itaque sint praesentium voluptas, iste esse illum eius
-     aperiam magni atque eum voluptatem ullam voluptate explicabo dolor enim
-     deserunt! Sunt. l;Lorem ipsum dolor sit amet consectetur adipisicing
-     elit. Aliquid, dignissimos. Itaque sint praesentium voluptas, iste esse
-     illum eius aperiam magni atque eum voluptatem ullam voluptate explicabo
-     dolor enim deserunt! Sunt. l;Lorem ipsum dolor sit amet consectetur
-     adipisicing elit. Aliquid, dignissimos. Itaque sint praesentium
-     voluptas, iste esse illum eius aperiam magni atque eum voluptatem ullam
-     voluptate explicabo dolor enim deserunt! Sunt.`;
-   document.getElementById('charts').append(d);
 }
 
 function initializeBuilders() {

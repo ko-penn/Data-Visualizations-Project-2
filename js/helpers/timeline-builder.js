@@ -9,11 +9,13 @@ export class TimelineBuilder {
       this.initVis();
 
       this.config.parentElement.parentNode.addEventListener('click', () => {
-         this.chart.call(this.brush.move, null);
-         this.selectedYears = null;
-         this.pause();
-         this.updateVis();
-         this.triggerDataUpdate();
+         if (this.selectedYears !== null) {
+            this.chart.call(this.brush.move, null);
+            this.selectedYears = null;
+            this.pause();
+            this.updateVis();
+            this.triggerDataUpdate();
+         }
       });
       window.addEventListener('resize', () => {
          this.setWidthAndHeight();
@@ -26,16 +28,7 @@ export class TimelineBuilder {
 
       this.setWidthAndHeight();
 
-      const years = this.data.map((d) => d.year);
-      const minYear = Math.min(...years);
-      const maxYear = Math.max(...years);
-      this.yearCountMap = {};
-      for (let i = minYear; i <= maxYear; i++) {
-         this.yearCountMap[i] = 0;
-      }
-      this.data.forEach((d) => {
-         this.yearCountMap[d.year]++;
-      });
+      this.buildYearCountMap();
 
       this.svg = d3.select(this.config.parentElementSelector);
 
@@ -90,16 +83,15 @@ export class TimelineBuilder {
 
       this.updateVis();
 
-      this.selection = this.snappedSelection(this.xScale, [minYear]);
+      this.selection = this.snappedSelection(this.xScale, [
+         Math.min(...Object.keys(this.yearCountMap)),
+      ]);
       this.chart.call(this.brush.move, this.selection);
       this.triggerDataUpdate();
    }
 
    updateVis() {
-      this.brush.extent([
-         [0, 0],
-         [this.width, this.height],
-      ]);
+      this.setWidthAndHeight();
 
       this.xScale.domain(Object.keys(this.yearCountMap)).range([0, this.width]);
       this.yScale
@@ -123,7 +115,7 @@ export class TimelineBuilder {
          .attr('fill', 'orange');
 
       // update bars
-      d3.selectAll('.data-point').attr('opacity', (k) => {
+      this.dataGroup.selectAll('.data-point').attr('opacity', (k) => {
          return !this.selectedYears || this.selectedYears.includes(`${k}`)
             ? 1
             : 0.4;
@@ -159,9 +151,25 @@ export class TimelineBuilder {
             return;
          }
 
-         this.selection = this.snappedSelection(this.xScale, [
-            minYearInSelection + 1,
-         ]);
+         let nextClosestYear = minYearInSelection + 1;
+         if (formData.hideYearsWithoutData) {
+            nextClosestYear = null;
+            Object.keys(this.yearCountMap).forEach((k) => {
+               if (
+                  k > minYearInSelection &&
+                  (k < nextClosestYear || nextClosestYear == null)
+               ) {
+                  nextClosestYear = k;
+               }
+            });
+
+            if (!nextClosestYear) {
+               clearInterval(this.playInterval);
+               return;
+            }
+         }
+
+         this.selection = this.snappedSelection(this.xScale, [nextClosestYear]);
          this.chart.call(this.brush.move, this.selection);
          this.triggerDataUpdate();
          this.updateVis();
@@ -235,6 +243,21 @@ export class TimelineBuilder {
          this.config.parentElement.getBoundingClientRect().height -
          this.config.margin.top -
          this.config.margin.bottom;
+
+      requestAnimationFrame(() => {
+         this.brush?.extent([
+            [0, 0],
+            [this.width, this.height],
+         ]);
+         this.chart.call(this.brush);
+         if (this.brush && this.xScale && this.selectedYears) {
+            this.selection = this.snappedSelection(
+               this.xScale,
+               this.selectedYears
+            );
+            this.chart?.call(this.brush.move, this.selection);
+         }
+      });
    }
 
    selectYearsFromBrush(s0, s1, singleSelect, event) {
@@ -266,7 +289,9 @@ export class TimelineBuilder {
    handleTimelineControls() {
       const controls = document.getElementById('timeline-controls');
 
-      controls.innerHTML = `
+      const controlsTop = document.createElement('div');
+      controlsTop.classList.add('controls-top');
+      controlsTop.innerHTML = `
          <div class="buttons">
             <button id="play" type="button">
                <i class="fas fa-play"></i>
@@ -282,7 +307,16 @@ export class TimelineBuilder {
          'Timeline Speed'
       );
       this.timelineSpeedControl.querySelector('select').value = 'normal';
-      controls.append(this.timelineSpeedControl);
+      controlsTop.append(this.timelineSpeedControl);
+
+      const controlsBottom = document.createElement('div');
+      controlsBottom.classList.add('controls-bottom');
+      this.hideYearsWithoutDataCheckbox =
+         this.buildHideYearsWithoutDataCheckbox();
+      controlsBottom.append(this.hideYearsWithoutDataCheckbox);
+
+      controls.append(controlsTop);
+      controls.append(controlsBottom);
 
       controls.addEventListener('click', (event) => {
          // Prevent click propogations from causing brush selection to be cleared
@@ -304,6 +338,74 @@ export class TimelineBuilder {
       });
       document.getElementById('pause').addEventListener('click', (event) => {
          this.pause();
+      });
+      this.hideYearsWithoutDataCheckbox.addEventListener('click', (event) => {
+         const checked =
+            !this.hideYearsWithoutDataCheckbox.querySelector('input').checked;
+         this.setHideYearsWithoutDataCheckbox(checked);
+      });
+   }
+
+   buildHideYearsWithoutDataCheckbox() {
+      const checkboxContainer = document.createElement('div');
+      checkboxContainer.id = 'no-data-year-checkbox';
+
+      const input = document.createElement('input');
+      input.name = 'no-data-year-checkbox';
+      input.type = 'checkbox';
+
+      input.value = formData.hideYearsWithoutData;
+
+      input.addEventListener('click', (e) => {
+         e.preventDefault();
+         e.stopPropagation();
+         this.setHideYearsWithoutDataCheckbox(e.target.checked);
+      });
+
+      const label = document.createElement('label');
+      label.setAttribute('for', 'no-data-year-checkbox');
+      label.innerText = 'Hide years without data';
+
+      checkboxContainer.append(input);
+      checkboxContainer.append(label);
+
+      return checkboxContainer;
+   }
+
+   setHideYearsWithoutDataCheckbox(checked) {
+      requestAnimationFrame(() => {
+         this.hideYearsWithoutDataCheckbox.querySelector('input').checked =
+            checked;
+         formData.hideYearsWithoutData = checked;
+         this.buildYearCountMap();
+         this.updateVis();
+         this.selectedYears = this.selectedYears.filter((y) =>
+            Object.keys(this.yearCountMap).includes(y)
+         );
+         this.selection = this.snappedSelection(
+            this.xScale,
+            this.selectedYears
+         );
+         this.chart.call(this.brush.move, this.selection);
+         this.triggerDataUpdate();
+      });
+   }
+
+   buildYearCountMap() {
+      const years = this.data.map((d) => d.year);
+      this.yearCountMap = {};
+      if (!formData.hideYearsWithoutData) {
+         const minYear = Math.min(...years);
+         const maxYear = Math.max(...years);
+         for (let i = minYear; i <= maxYear; i++) {
+            this.yearCountMap[i] = 0;
+         }
+      }
+      this.data.forEach((d) => {
+         if (!this.yearCountMap[d.year]) {
+            this.yearCountMap[d.year] = 0;
+         }
+         this.yearCountMap[d.year]++;
       });
    }
 }

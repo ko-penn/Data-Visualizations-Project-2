@@ -4,7 +4,6 @@ export class LeafletMap {
          parentElementSelector: _config.parentElementSelector,
          parentElement: document.querySelector(_config.parentElementSelector),
          id: _config.id,
-         margin: _config.margin ?? '0',
       };
       this.data = _data;
       this.initVis();
@@ -39,7 +38,8 @@ export class LeafletMap {
       }
       this.mainDiv
          .style('overflow-x', 'hidden')
-         .style('margin', this.config.margin);
+         .style('height', `100%`)
+         .style('width', `100%`);
 
       this.map = L.map(this.config.id, {
          center: [30, 0],
