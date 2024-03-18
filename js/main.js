@@ -45,6 +45,17 @@ function processData() {
          d.totd = timeOfTheDay['evening'];
       }
 
+      if (d.month <= 1 || d.month >= 11) {
+         d.season = season['winter'];
+      } else if (d.month >= 5 && d.month <= 7) {
+         d.season = season['summer'];
+      } else if (d.month >= 2 && d.month <= 4) {
+         d.season = season['spring'];
+      } else if (d.month >= 8 && d.month <= 10) {
+         d.season = season['fall'];
+      }
+
+      seasons.add(d.season);
       shapes.add(d.ufo_shape);
 
       return d;
@@ -63,22 +74,42 @@ function initializeCharts() {
 
    // Build bar charts
    const barChartsContainerSelector = '#bar-charts-container';
-   totdFreqBar = new Bar(
+   const barConfigs = [
       {
          parentElementSelector: barChartsContainerSelector,
          id: 'totd',
          key: 'totd',
+         yAxisTitle: '# of Occurrences',
+         xAxisTitle: 'Time of the Day',
       },
-      data
-   );
-   shapeFreqBar = new Bar(
       {
          parentElementSelector: barChartsContainerSelector,
          id: 'shape',
          key: 'ufo_shape',
+         yAxisTitle: '# of Occurrences',
+         xAxisTitle: 'UFO Shape',
       },
-      data
-   );
+      {
+         parentElementSelector: barChartsContainerSelector,
+         id: 'season',
+         key: 'season',
+         yAxisTitle: '# of Occurrences',
+         xAxisTitle: 'Season',
+      },
+   ];
+   document.querySelector(barChartsContainerSelector).style[
+      'grid-template-columns'
+   ] = `repeat(${barConfigs.length}, 1fr)`;
+   barConfigs.forEach((c) => {
+      const bar = new Bar(c, data);
+      if (c.id === 'totd') {
+         totdFreqBar = bar;
+      } else if (c.id === 'shape') {
+         shapeFreqBar = bar;
+      } else if (c.id === 'season') {
+         seasonFreqBar = bar;
+      }
+   });
 
    // Build Histograms
    // encounterLengthFreqBar = new Bar(

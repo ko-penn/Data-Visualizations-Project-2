@@ -28,7 +28,16 @@ globalThis.timeOfTheDay = {
    evening: 'Evening',
 };
 
+globalThis.season = {
+   winter: 'Winter',
+   summer: 'Summer',
+   spring: 'Spring',
+   fall: 'Fall',
+};
+
 globalThis.shapes = new Set();
+
+globalThis.seasons = new Set();
 
 globalThis.encounterLengthCategories = {
    xShort: 'Extremely Short',
@@ -116,6 +125,12 @@ globalThis.shapeFreqBar = null;
 
 /**
  * @type {(Bar | null)}
+ * Object for season freq bar chart instance
+ */
+globalThis.seasonFreqBar = null;
+
+/**
+ * @type {(Bar | null)}
  * Object for encounter length freq bar chart instance
  */
 globalThis.encounterLengthFreqBar = null;
@@ -164,11 +179,13 @@ globalThis.updateAllVis = (dataChange) => {
       totdFreqBar?.updateData(data);
       shapeFreqBar?.updateData(data);
       encounterLengthFreqBar?.updateData(data);
+      seasonFreqBar?.updateData(data);
    } else {
       // TODO: update other visualizations when form changes
       map?.updateVis();
       totdFreqBar?.updateVis();
       shapeFreqBar?.updateVis();
+      seasonFreqBar?.updateVis();
       encounterLengthFreqBar?.updateVis();
    }
 };

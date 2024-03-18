@@ -6,6 +6,8 @@ export class Bar {
          margin: _config.margin || { top: 25, right: 25, bottom: 25, left: 45 },
          id: _config.id,
          key: _config.key,
+         yAxisTitle: _config.yAxisTitle,
+         xAxisTitle: _config.xAxisTitle,
       };
       this.data = _data;
       this.initVis();
@@ -24,7 +26,24 @@ export class Bar {
             .append('div')
             .attr('height', '100%')
             .attr('width', '100%')
-            .attr('id', this.config.id);
+            .attr('id', this.config.id)
+            .style('display', 'grid')
+            .style(
+               'grid-template-areas',
+               `
+                  "y chart chart chart chart"
+                  "y chart chart chart chart"
+                  "y chart chart chart chart"
+                  "y chart chart chart chart"
+                  ". x x x x"
+                  ". legend legend legend legend"
+               `
+            )
+            .style('grid-template-columns', 'max-content repeat(4, 1fr)')
+            .style(
+               'grid-template-rows',
+               'repeat(4, 1fr) repeat(2, max-content)'
+            );
       } else {
          this.mainDiv = d3.select(
             `${this.config.parentElementSelector} #${this.config.id}`
@@ -35,11 +54,34 @@ export class Bar {
 
       this.setWidthAndHeight();
 
-      this.svg = d3
-         .select(`#${this.config.id}`)
+      this.mainDiv
+         .append('p')
+         .attr('class', 'y-axis-title')
+         .style('grid-area', 'y')
+         .style('writing-mode', 'vertical-rl')
+         .style('text-orientation', 'mixed')
+         .style('text-align', 'center')
+         .style('transform', 'rotate(180deg)')
+         .text(this.config.yAxisTitle);
+
+      this.mainDiv
+         .append('p')
+         .attr('class', 'x-axis-title')
+         .style('grid-area', 'x')
+         .style('text-align', 'center')
+         .text(this.config.xAxisTitle);
+
+      this.legend = this.mainDiv
+         .append('div')
+         .attr('class', 'legend')
+         .style('grid-area', 'legend')
+         .style('text-align', 'center');
+
+      this.svg = this.mainDiv
          .append('svg')
          .attr('height', '100%')
-         .attr('width', '100%');
+         .attr('width', '100%')
+         .style('grid-area', 'chart');
 
       this.chart = this.svg
          .append('g')
@@ -62,7 +104,6 @@ export class Bar {
       this.xAxisG = this.chart
          .append('g')
          .attr('class', 'axis x-axis')
-         .attr('transform', `translate(0,${this.height})`)
          .attr('clip-path', 'url(#clip)');
 
       this.yScale = d3.scaleLinear().range([this.height, 0]);
@@ -94,12 +135,6 @@ export class Bar {
       this.disclaimer = this.svg
          .append('g')
          .attr('class', 'disclaimer')
-         .attr(
-            'transform',
-            `translate(${this.width / 2 + this.config.margin.left}, ${
-               this.height / 2 + this.config.margin.top
-            })`
-         )
          .attr('text-anchor', 'middle');
       this.disclaimer
          .append('text')
@@ -118,12 +153,13 @@ export class Bar {
          .domain(Object.keys(this.freqMap).filter((k) => this.freqMap[k]))
          .range([0, this.width]);
       this.yScale
-         .domain(
-            d3.extent(
+         .domain([
+            0,
+            d3.max(
                Object.keys(this.freqMap).filter((k) => this.freqMap[k]),
                (k) => this.freqMap[k]
-            )
-         )
+            ),
+         ])
          .range([this.height, 0]);
       this.dataGroup
          .selectAll('.data-point')
@@ -137,6 +173,7 @@ export class Bar {
          .attr('height', (k) => this.height - this.yScale(this.freqMap[k]))
          .attr('fill', 'orange');
 
+      this.updateLegend();
       this.updateDisclaimer();
 
       this.xAxisG.call(this.xAxis);
@@ -164,29 +201,35 @@ export class Bar {
       }
    }
 
+   updateLegend() {
+      // TODO: build legend html from color scale/domain
+   }
+
    setWidthAndHeight() {
-      this.width =
-         document.getElementById(this.config.id).getBoundingClientRect().width -
-         this.config.margin.left -
-         this.config.margin.right;
-      this.height =
-         document.getElementById(this.config.id).getBoundingClientRect()
-            .height -
-         this.config.margin.top -
-         this.config.margin.bottom;
+      const svg = document.getElementById(this.config.id)?.querySelector('svg');
+      if (svg) {
+         this.width =
+            svg.getBoundingClientRect().width -
+            this.config.margin.left -
+            this.config.margin.right;
+         this.height =
+            svg.getBoundingClientRect().height -
+            this.config.margin.top -
+            this.config.margin.bottom;
 
-      const extent = [
-         [0, 0],
-         [this.width, this.height],
-      ];
-      this.zoom?.translateExtent(extent).extent(extent);
+         const extent = [
+            [0, 0],
+            [this.width, this.height],
+         ];
+         this.zoom?.translateExtent(extent).extent(extent);
 
-      this.xAxisG?.attr('transform', `translate(0,${this.height})`);
+         this.xAxisG?.attr('transform', `translate(0,${this.height})`);
 
-      this.clipPath?.attr('width', this.width).attr('height', this.height);
+         this.clipPath?.attr('width', this.width).attr('height', this.height);
 
-      this.xScale?.range([0, this.width]);
-      this.yScale?.range([this.height, 0]);
+         this.xScale?.range([0, this.width]);
+         this.yScale?.range([this.height, 0]);
+      }
    }
 
    buildFreqMap() {
@@ -196,6 +239,8 @@ export class Bar {
          values = Object.values(timeOfTheDay);
       } else if (this.config.key === 'ufo_shape') {
          values = Array.from(shapes);
+      } else if (this.config.key === 'season') {
+         values = Array.from(seasons);
       }
 
       values.forEach((v) => {
