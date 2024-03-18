@@ -120,17 +120,10 @@ export class Bar {
          .attr('width', this.width)
          .attr('height', this.height);
 
-      const extent = [
-         [0, 0],
-         [this.width, this.height],
-      ];
-      this.zoom = d3
-         .zoom()
-         .scaleExtent([1, 1000])
-         .translateExtent(extent)
-         .extent(extent)
-         .on('zoom', (event) => this.zoomed(event));
-      this.svg.call(this.zoom);
+      this.brush = d3
+         .brushX()
+         .handleSize(8)
+         .on('end', (event) => this.brushing(event));
 
       this.disclaimer = this.svg
          .append('g')
@@ -217,12 +210,6 @@ export class Bar {
             this.config.margin.top -
             this.config.margin.bottom;
 
-         const extent = [
-            [0, 0],
-            [this.width, this.height],
-         ];
-         this.zoom?.translateExtent(extent).extent(extent);
-
          this.xAxisG?.attr('transform', `translate(0,${this.height})`);
 
          this.clipPath?.attr('width', this.width).attr('height', this.height);
@@ -230,6 +217,14 @@ export class Bar {
          this.xScale?.range([0, this.width]);
          this.yScale?.range([this.height, 0]);
       }
+
+      requestAnimationFrame(() => {
+         this.brush?.extent([
+            [0, 0],
+            [this.width ?? 0, this.height ?? 0],
+         ]);
+         this.chart?.call(this.brush);
+      });
    }
 
    buildFreqMap() {
@@ -252,17 +247,63 @@ export class Bar {
       });
    }
 
-   zoomed(event) {
-      this.xScale.range([0, this.width].map((d) => event.transform.applyX(d)));
+   brushing(event) {
+      if (!event.selection && !event.sourceEvent) return;
 
-      this.dataGroup
-         .selectAll('.data-point')
-         .data(Object.keys(this.freqMap).filter((k) => this.freqMap[k]))
-         .join('rect')
-         .attr('class', 'data-point')
-         .attr('x', (k) => this.xScale(k))
-         .attr('width', this.xScale.bandwidth());
+      event.sourceEvent?.preventDefault();
+      event.sourceEvent?.stopPropagation();
 
-      this.svg.selectAll('.x-axis').call(this.xAxis);
+      const singleSelect = !event.selection;
+      const [s0, s1] = !singleSelect
+         ? event.selection
+         : [1, 2].fill(event.sourceEvent.clientX);
+
+      this.selectDomainFromBrush(s0, s1, singleSelect, event);
+   }
+
+   filteredDomain(scale, min, max, singleSelect) {
+      const domainVals = scale
+         .domain()
+         .map((d, i) => ({
+            min: Math.floor(scale(d)),
+            max: Math.ceil(scale(d) + scale.bandwidth()),
+            i,
+         }))
+         .filter((d) => d.min <= max && min <= d.max);
+
+      return scale
+         .domain()
+         .filter((d, i) => domainVals.map((d) => d.i).includes(i));
+   }
+
+   snappedSelection(bandScale, domain) {
+      const domainVals = domain.map((d) => bandScale(d));
+      return [d3.min(domainVals), d3.max(domainVals) + bandScale.bandwidth()];
+   }
+
+   selectDomainFromBrush(s0, s1, singleSelect, event) {
+      this.selectedDomain = this.filteredDomain(
+         this.xScale,
+         s0,
+         s1,
+         singleSelect
+      );
+
+      this.selection = this.snappedSelection(this.xScale, this.selectedDomain);
+
+      if (event && event.sourceEvent && event.type === 'end') {
+         this.chart.transition().call(event.target.move, this.selection);
+         this.updateVis();
+      }
+      this.triggerDataUpdate();
+   }
+
+   triggerDataUpdate() {
+      // console.log(data, this.selectedDomain);
+      // const preData = [...data];
+      // data = processedData.filter(
+      //    (d) => !this.selectedYears || this.selectedYears.includes(`${d.year}`)
+      // );
+      // updateAllVis(JSON.stringify(data) !== JSON.stringify(preData));
    }
 }

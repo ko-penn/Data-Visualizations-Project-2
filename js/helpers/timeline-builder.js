@@ -125,7 +125,6 @@ export class TimelineBuilder {
       this.xAxisG.call(this.xAxis);
       this.yAxisG.call(this.yAxis);
 
-
       this.svg
          .select('.overlay')
          .on('mousemove', (event, k) => this.mouseOverTooltipCB(event))
