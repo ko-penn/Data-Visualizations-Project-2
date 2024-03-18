@@ -124,6 +124,24 @@ export class TimelineBuilder {
       this.xAxis.tickValues(this.xScale.domain().filter((d, i) => !(i % 3)));
       this.xAxisG.call(this.xAxis);
       this.yAxisG.call(this.yAxis);
+
+
+      this.svg
+         .select('.overlay')
+         .on('mousemove', (event, k) => this.mouseOverTooltipCB(event))
+         .on('mouseleave', () => this.mouseLeaveTooltipCB());
+      this.svg
+         .select('.selection')
+         .on('mousemove', (event, k) => this.mouseOverTooltipCB(event))
+         .on('mouseleave', () => this.mouseLeaveTooltipCB());
+
+      const tooltip = d3.select('#tooltip');
+      tooltip.on('mouseover', () => {
+         tooltip.style('opacity', 1).style('pointer-events', 'all');
+      });
+      tooltip.on('mouseleave', () => {
+         tooltip.style('opacity', 0).style('pointer-events', 'none');
+      });
    }
 
    play() {
@@ -407,5 +425,49 @@ export class TimelineBuilder {
          }
          this.yearCountMap[d.year]++;
       });
+   }
+
+   mouseOverTooltipCB(event) {
+      const tooltip = d3.select('#tooltip');
+      const tooltipElm = tooltip.node();
+      const tooltipBounds = tooltipElm.getBoundingClientRect();
+      const chartBounds = this.config.parentElement.getBoundingClientRect();
+      const { pageX, pageY } = event;
+
+      const domain = this.xScale.domain();
+      const xDomainIndex = Math.ceil(
+         (event.clientX - this.config.margin.left - this.config.margin.right) /
+            this.xScale.step()
+      );
+
+      const year = domain[Math.min(xDomainIndex, domain.length - 1)];
+      tooltip
+         .style('pointer-events', 'all')
+         .style('opacity', '1')
+         .style(
+            'left',
+            Math.min(
+               pageX,
+               chartBounds.x + chartBounds.width - tooltipBounds.width
+            ) + 'px'
+         )
+         .style(
+            'top',
+            Math.min(
+               pageY,
+               chartBounds.y + chartBounds.height - tooltipBounds.height
+            ) +
+               10 +
+               'px'
+         ).html(`
+            <small><strong>${year}</strong></small>
+            <p>${this.yearCountMap[year]} Occurrences</p>
+          `);
+   }
+
+   mouseLeaveTooltipCB(event) {
+      d3.select('#tooltip')
+         .style('opacity', '0')
+         .style('pointer-events', 'none');
    }
 }
