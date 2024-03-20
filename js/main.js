@@ -103,7 +103,7 @@ function initializeCharts() {
    barChartsContainer.style[
       'grid-template-columns'
    ] = `repeat(${barConfigs.length}, 1fr)`;
-   barChartsContainer.style['grid-template-rows'] = `auto max-content`;
+   barChartsContainer.style['grid-template-rows'] = `90% max-content`;
    barConfigs.forEach((c) => {
       const bar = new Bar(c, data);
       if (c.id === 'totd') {
