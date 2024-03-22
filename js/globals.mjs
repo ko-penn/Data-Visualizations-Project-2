@@ -1,5 +1,5 @@
 import { Bar, LeafletMap } from "./charts/index.mjs";
-import { HeaderFormBuilder } from "./index.mjs";
+import { MapFormBuilder } from "./index.mjs";
 
 // ---------- Data variables ----------
 
@@ -99,10 +99,10 @@ globalThis.formData = {
 globalThis.timelineBuilder = null;
 
 /**
- * @type {(HeaderFormBuilder | null)}
+ * @type {(MapFormBuilder | null)}
  * Object for header form build instance
  */
-globalThis.formBuilder = null;
+globalThis.mapFormBuilder = null;
 
 // ---------- Chart variables ----------
 
