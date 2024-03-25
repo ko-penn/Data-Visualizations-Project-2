@@ -31,23 +31,24 @@ button:hover {
    display: flex;
    justify-content: space-between;
    align-items: center;
-   #info {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background-color: black;
-      color: white;
+   .rhs {
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 1em;
-      cursor: pointer;
-      outline: none;
-      border: none;
-      transition: 0.3s;
-   }
-   #info:hover {
-      background-color: rgb(56, 56, 56);
+      #clear {
+         margin-right: 1em;
+         border: 1px solid #ebebeb;
+      }
+
+      #info {
+         border: 1px solid #ebebeb;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         i {
+            margin-left: 0.5em;
+         }
+      }
    }
 }
 

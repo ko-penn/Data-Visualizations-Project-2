@@ -271,6 +271,11 @@ export class Bar {
       this.selectDomainFromBrush(s0, s1, singleSelect, event);
    }
 
+   clearSelection() {
+      this.selectedDomain = null;
+      this.chart.transition().call(this.brush.move, [0, 0]);
+   }
+
    filteredDomain(scale, min, max, singleSelect) {
       const domainVals = scale
          .domain()
@@ -308,15 +313,10 @@ export class Bar {
          this.chart.transition().call(event.target.move, this.selection);
          this.updateVis();
       }
-      this.triggerDataUpdate();
-   }
-
-   triggerDataUpdate() {
-      // console.log(data, this.selectedDomain);
-      // const preData = [...data];
-      // data = processedData.filter(
-      //    (d) => !this.selectedYears || this.selectedYears.includes(`${d.year}`)
-      // );
-      // updateAllVis(JSON.stringify(data) !== JSON.stringify(preData));
+      handleGlobalFilterChange();
+      if (formData.hideFrequencyCategoriesWithoutData) {
+         // Reset brush selection since data change will cause data under selection to move
+         this.chart.call(this.brush.move, null);
+      }
    }
 }
