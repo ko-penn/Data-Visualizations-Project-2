@@ -38,6 +38,25 @@ button:hover {
       #clear {
          margin-right: 1em;
          border: 1px solid #ebebeb;
+         position: relative;
+         #selections-count {
+            position: absolute;
+            right: -0.5em;
+            top: -0.5em;
+            background-color: white;
+            border: 1px solid #ebebeb;
+            border-radius: 50em;
+            padding: 0.5em;
+            aspect-ratio: 1;
+            height: 1.675em;
+            line-height: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+         }
+         #selections-count.hide {
+            display: none;
+         }
       }
 
       #info {

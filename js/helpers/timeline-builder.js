@@ -472,7 +472,9 @@ export class TimelineBuilder {
                'px'
          ).html(`
             <small><strong>${year}</strong></small>
-            <p>${this.yearCountMap[year]} Occurrences</p>
+            <p>${this.yearCountMap[year]} Occurrence${
+         this.yearCountMap[year] === 1 ? '' : 's'
+      }</p>
           `);
    }
 
