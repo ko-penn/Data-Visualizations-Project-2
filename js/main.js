@@ -1,4 +1,4 @@
-import { Bar, LeafletMap } from "./charts/index.mjs";
+import { Bar, Histogram, LeafletMap } from "./charts/index.mjs";
 import { MapFormBuilder, TimelineBuilder } from "./helpers/index.mjs";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -132,14 +132,16 @@ function initializeCharts() {
   });
 
   // Build Histograms
-  // encounterLengthFreqBar = new Bar(
-  //    {
-  //       parentElementSelector: barChartsContainerSelector,
-  //       id: 'length',
-  //       key: 'encounter_length',
-  //    },
-  //    data
-  // );
+  encounterLengthFreqBar = new Histogram(
+      {
+        parentElementSelector: "#scatter-histogram-charts-container",
+        id: 'length',
+        key: 'encounter_length',
+        yAxisTitle: "# of Occurrences",
+        xAxisTitle: "Encounter Length",
+      },
+      data
+    );
 
   // Build scatter plot charts
 
@@ -167,6 +169,7 @@ function clearGlobalFilters() {
   totdFreqBar && totdFreqBar.clearSelection();
   shapeFreqBar && shapeFreqBar.clearSelection();
   seasonFreqBar && seasonFreqBar.clearSelection();
+  encounterLengthFreqBar && encounterLengthFreqBar.clearSelection();
 
   handleGlobalFilterChange();
 }
