@@ -253,14 +253,13 @@ export class Histogram {
          .histogram()
          .value(function (d) {
             return d.encounter_length;
-         }) // I need to give the vector of value
+         })
          .domain([
             0,
             d3.max(this.data, function (d) {
                return d.encounter_length;
-            }),
-         ]); // then the domain of the graphic
-      //.thresholds(70); // then the numbers of bins
+            })
+         ]).thresholds(9);
 
       // And apply this function to data to get the bins
       this.bins = histogram(this.data);
@@ -286,25 +285,18 @@ export class Histogram {
    }
 
    filteredDomain(scale, min, max, singleSelect) {
-      //how does this work
-      const domainVals = scale
-         .domain()
-         .map((d, i) => ({
-            min: Math.floor(scale(d)),
-            max: Math.ceil(scale(d) + scale.bandwidth()),
-            i,
-         }))
-         .filter((d) => d.min <= max && min <= d.max);
-
-      return scale
-         .domain()
-         .filter((d, i) => domainVals.map((d) => d.i).includes(i));
+      const bandwidth = this.xScale(this.bins[0].x1 - this.bins[0].x0);
+      const x0Index =
+         Math.ceil((min) / bandwidth) - 1;
+      const x1Index = 
+         Math.ceil((max) / bandwidth) - 1;
+      return ([this.bins[x0Index].x0,this.bins[x1Index].x1]);
    }
 
-   snappedSelection(bandScale, domain) {
+   /*snappedSelection(bandScale, domain) { //not sure what this does
       const domainVals = domain.map((d) => bandScale(d));
       return [d3.min(domainVals), d3.max(domainVals) + bandScale.bandwidth()];
-   }
+   }*/
 
    selectDomainFromBrush(s0, s1, singleSelect, event) {
       this.selectedDomain = this.filteredDomain(
@@ -314,13 +306,13 @@ export class Histogram {
          singleSelect
       );
 
-      this.selection = this.snappedSelection(
+      /*this.selection = this.snappedSelection( //not sure what this does
          this.xScale,
          this.selectedDomain
-      ).map((d) => (isNaN(d) || d === undefined ? -1 : d));
+      ).map((d) => (isNaN(d) || d === undefined ? -1 : d));*/
 
       if (event && event.sourceEvent && event.type === 'end') {
-         this.chart.transition().call(event.target.move, this.selection);
+         /*this.chart.transition().call(event.target.move, this.selection);*/ //not sure what this does
          this.updateVis();
       }
       handleGlobalFilterChange();
@@ -368,7 +360,7 @@ export class Histogram {
             <p>${
                domainSelection != null ? domainSelection.length : 'undefined'
             } Occurrence${
-         domainSelection != null ? (domainSelection === 1 ? '' : 's') : 's'
+         domainSelection != null ? (domainSelection.length === 1 ? '' : 's') : 's'
       }</p>
             <p>Average: ${
                domainSelection != null
