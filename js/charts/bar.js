@@ -361,6 +361,7 @@ export class Bar {
 
       const domainSelection =
          domain[Math.max(Math.min(xDomainIndex, domain.length - 1), 0)];
+      
       tooltip
          .style('pointer-events', 'all')
          .style('opacity', '1')

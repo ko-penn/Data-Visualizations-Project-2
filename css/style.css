@@ -140,6 +140,24 @@ svg {
          }
       }
    }
+
+   #scatter-container {
+      #scatter-histogram-charts-container {
+         flex-grow: 1;
+         width: 100%;
+         display: grid;
+         grid-gap: 2em;
+
+         .disclaimer {
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            &.show {
+               opacity: 1;
+            }
+         }
+      }
+   }
 }
 
 .minimized {

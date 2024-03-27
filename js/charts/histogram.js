@@ -152,7 +152,7 @@ export class Histogram {
 
       this.xScale.domain([0,d3.max(this.bins,d=>d.x1)]).range([0, this.width]);
       this.yScale
-         .domain([0, d3.max(this.bins, (d) => d.length)])
+         .domain([0, d3.max(this.bins, function(d) {return d.length})])
          .range([this.height, 0]);
       this.dataGroup
          .selectAll('.data-point')
@@ -245,13 +245,13 @@ export class Histogram {
 
    buildBins() {
       let histogram = d3.histogram()
-      .value((d)=>{d.encounter_length})   // I need to give the vector of value
-      .domain([0,d3.max(this.data, function(d) { return d.encounter_length })])  // then the domain of the graphic
-      .thresholds(70); // then the numbers of bins
+      .value(function(d) {return d.encounter_length})   // I need to give the vector of value
+      .domain([0,d3.max(this.data, function(d) { return d.encounter_length })]);  // then the domain of the graphic
+      //.thresholds(70); // then the numbers of bins
 
       // And apply this function to data to get the bins
       this.bins = histogram(this.data);
-      //console.log(this.bins); //all bins are appearing with length 0
+      console.log(this.bins);
    }
 
    brushing(event) {
@@ -323,17 +323,14 @@ export class Histogram {
       const chartBounds = this.config.parentElement.getBoundingClientRect();
       const { pageX, pageY } = event;
 
-      const domain = this.xScale.domain();
+      const bandwidth = this.xScale(this.bins[0].x1-this.bins[0].x0);
       const xDomainIndex = Math.ceil(
-         (event.offsetX -
-            this.config.margin.left -
-            this.config.margin.right -
-            this.xScale.bandwidth()) /
-            this.xScale.step()
-      );
+         (event.offsetX - this.config.margin.left)/this.xScale(bandwidth)
+      )-1;
 
-      const domainSelection =
-         domain[Math.max(Math.min(xDomainIndex, domain.length - 1), 0)];
+      const domainSelection = this.bins[xDomainIndex];
+      console.log('xDomainIndex: '+xDomainIndex);
+      console.log('domainselection: '+domainSelection);
       tooltip
          .style('pointer-events', 'all')
          .style('opacity', '1')
