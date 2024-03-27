@@ -280,12 +280,10 @@ export class Bar {
 
       event.sourceEvent?.preventDefault();
       event.sourceEvent?.stopPropagation();
-
       const singleSelect = !event.selection;
       const [s0, s1] = !singleSelect
          ? event.selection
          : [1, 2].fill(event.sourceEvent.clientX);
-
       this.selectDomainFromBrush(s0, s1, singleSelect, event);
    }
 

@@ -251,7 +251,6 @@ export class Histogram {
 
       // And apply this function to data to get the bins
       this.bins = histogram(this.data);
-      console.log(this.bins);
    }
 
    brushing(event) {
@@ -273,7 +272,7 @@ export class Histogram {
       this.chart.transition().call(this.brush.move, [0, 0]);
    }
 
-   filteredDomain(scale, min, max, singleSelect) {
+   filteredDomain(scale, min, max, singleSelect) {//how does this work
       const domainVals = scale
          .domain()
          .map((d, i) => ({
@@ -325,12 +324,10 @@ export class Histogram {
 
       const bandwidth = this.xScale(this.bins[0].x1-this.bins[0].x0);
       const xDomainIndex = Math.ceil(
-         (event.offsetX - this.config.margin.left)/this.xScale(bandwidth)
+         (event.offsetX - this.config.margin.left)/bandwidth
       )-1;
 
       const domainSelection = this.bins[xDomainIndex];
-      console.log('xDomainIndex: '+xDomainIndex);
-      console.log('domainselection: '+domainSelection);
       tooltip
          .style('pointer-events', 'all')
          .style('opacity', '1')
@@ -350,16 +347,32 @@ export class Histogram {
                10 +
                'px'
          ).html(`
-            <small><strong>${domainSelection.x0} to ${domainSelection.x1}</strong></small>
-            <p>${this.bins[domainSelection].length} Occurrence${
-         this.freqMap[domainSelection].length === 1 ? '' : 's'
-      }</p>
-          `);
+            <small><strong>${domainSelection != null ? domainSelection.x0 : 'undefined'} to ${domainSelection != null ? domainSelection.x1 : 'undefined'}</strong></small>
+            <p>${domainSelection != null ? domainSelection.length : 'undefined'} Occurrence${domainSelection != null ? (domainSelection === 1 ? '' : 's') : 's'}</p>
+            <p>Average: ${domainSelection != null ? (domainSelection.length > 0 ? this.average(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
+            <p>Minimum: ${domainSelection != null ? (domainSelection.length > 0 ? this.minimum(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
+            <p>Maximum: ${domainSelection != null ? (domainSelection.length > 0 ? this.maximum(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
+         `);
    }
 
    mouseLeaveTooltipCB(event) {
       d3.select('#tooltip')
          .style('opacity', '0')
          .style('pointer-events', 'none');
+   }
+
+   average(data){
+      let avg = data.reduce((a, b) => a + b) / data.length;
+      return(avg)
+   }
+
+   minimum(data){
+      let min = arr => Math.min(...arr);
+      return(min(data))
+   }
+
+   maximum(data){
+      let max = arr => Math.max(...arr);
+      return(max(data))
    }
 }
