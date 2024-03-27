@@ -214,6 +214,11 @@ globalThis.handleGlobalFilterChange = () => {
          !seasonFreqBar?.legendBuilder.selectedLegendGroups ||
          seasonFreqBar.legendBuilder.selectedLegendGroups.has(`${d.season}`);
 
+      const meetsEncounterHistogramConstraint =
+         !encounterLengthFreqBar?.selectedDomain ||
+         (d.encounter_length >= encounterLengthFreqBar.selectedDomain[0] &&
+            d.encounter_length <= encounterLengthFreqBar.selectedDomain[1]);
+
       if (!meetsTotdFreqBarConstraint) {
          selectionFilters.add('TotdFreqBarContraint');
          return false;
@@ -227,14 +232,19 @@ globalThis.handleGlobalFilterChange = () => {
          return false;
       }
 
+      if (! meetsEncounterHistogramConstraint) {
+         selectionFilters.add('EncounterHistogramConstraint');
+         return false;
+      }
+
       return (
          meetsTimelineFilterContraints &&
          meetsTotdFreqBarConstraint &&
          meetsShapeFreqBarConstraint &&
-         meetsSeasonFreqBarConstraint
+         meetsSeasonFreqBarConstraint &&
+         meetsEncounterHistogramConstraint
       );
    });
-
    updateAllVis(JSON.stringify(data) !== JSON.stringify(preData));
 
    const selectionCount = document.getElementById('selections-count');
