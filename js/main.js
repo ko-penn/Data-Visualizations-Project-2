@@ -13,9 +13,12 @@ async function main() {
 
    processData();
    initializeBuilders();
-   initializeCharts();
 
-   initializeEventListeners();
+   // After timeline fully builts and applies its data filtering, then render charts to prevent full data render on init
+   setTimeout(() => {
+      initializeCharts();
+      initializeEventListeners();
+   }, 500);
 }
 
 function processData() {
@@ -114,7 +117,6 @@ function initializeCharts() {
          seasonFreqBar = bar;
       }
    });
-
    barConfigs.forEach((c) => {
       let bar;
       if (c.id === 'totd') {

@@ -1,4 +1,4 @@
-import { Bar, LeafletMap } from './charts/index.mjs';
+import { Bar, Histogram, LeafletMap } from './charts/index.mjs';
 import { MapFormBuilder } from './index.mjs';
 
 // ---------- Data variables ----------
@@ -131,7 +131,7 @@ globalThis.shapeFreqBar = null;
 globalThis.seasonFreqBar = null;
 
 /**
- * @type {(Bar | null)}
+ * @type {(Histogram | null)}
  * Object for encounter length freq bar chart instance
  */
 globalThis.encounterLengthFreqBar = null;
@@ -193,57 +193,70 @@ globalThis.updateAllVis = (dataChange) => {
 /**
  * Handles refiltering processed data on a global filter change
  */
+let globalFilterChangeTimeout = null;
 globalThis.handleGlobalFilterChange = () => {
-   const selectionFilters = new Set();
-   const preData = [...data];
-   data = processedData.filter((d) => {
-      // Timeline chart
-      const meetsTimelineFilterContraints =
-         !timelineBuilder?.selectedYears ||
-         timelineBuilder.selectedYears.length === 0 ||
-         timelineBuilder.selectedYears.includes(`${d.year}`);
+   // Debounce globalFilterChanges so repeat calls done refilter data erroneously
+   if (globalFilterChangeTimeout) clearTimeout(globalFilterChangeTimeout);
 
-      // Freq bar charts
-      const meetsTotdFreqBarConstraint =
-         !totdFreqBar?.legendBuilder.selectedLegendGroups ||
-         totdFreqBar.legendBuilder.selectedLegendGroups.has(`${d.totd}`);
-      const meetsShapeFreqBarConstraint =
-         !shapeFreqBar?.legendBuilder.selectedLegendGroups ||
-         shapeFreqBar.legendBuilder.selectedLegendGroups.has(`${d.ufo_shape}`);
-      const meetsSeasonFreqBarConstraint =
-         !seasonFreqBar?.legendBuilder.selectedLegendGroups ||
-         seasonFreqBar.legendBuilder.selectedLegendGroups.has(`${d.season}`);
+   const debounceTimeInMS = 500;
+   globalFilterChangeTimeout = setTimeout(() => {
+      const selectionFilters = new Set();
+      const preData = [...data];
+      data = processedData.filter((d) => {
+         // Timeline chart
+         const meetsTimelineFilterContraints =
+            !timelineBuilder?.selectedYears ||
+            timelineBuilder.selectedYears.length === 0 ||
+            timelineBuilder.selectedYears.includes(`${d.year}`);
 
-      if (!meetsTotdFreqBarConstraint) {
-         selectionFilters.add('TotdFreqBarContraint');
-         return false;
+         // Freq bar charts
+         const meetsTotdFreqBarConstraint =
+            !totdFreqBar?.legendBuilder.selectedLegendGroups ||
+            totdFreqBar.legendBuilder.selectedLegendGroups.has(`${d.totd}`);
+         const meetsShapeFreqBarConstraint =
+            !shapeFreqBar?.legendBuilder.selectedLegendGroups ||
+            shapeFreqBar.legendBuilder.selectedLegendGroups.has(
+               `${d.ufo_shape}`
+            );
+         const meetsSeasonFreqBarConstraint =
+            !seasonFreqBar?.legendBuilder.selectedLegendGroups ||
+            seasonFreqBar.legendBuilder.selectedLegendGroups.has(`${d.season}`);
+
+         if (!meetsTotdFreqBarConstraint) {
+            selectionFilters.add('TotdFreqBarContraint');
+            return false;
+         }
+         if (!meetsShapeFreqBarConstraint) {
+            selectionFilters.add('ShapeFreqBarConstraint');
+            return false;
+         }
+         if (!meetsSeasonFreqBarConstraint) {
+            selectionFilters.add('SeasonFreqBarConstraint');
+            return false;
+         }
+
+         // Add filtering for maps selection circles
+         const circles = map?.filterCircles;
+         // console.error(circles);
+
+         return (
+            meetsTimelineFilterContraints &&
+            meetsTotdFreqBarConstraint &&
+            meetsShapeFreqBarConstraint &&
+            meetsSeasonFreqBarConstraint
+         );
+      });
+
+      updateAllVis(JSON.stringify(data) !== JSON.stringify(preData));
+
+      const selectionCount = document.getElementById('selections-count');
+      selectionCount.innerText = selectionFilters.size;
+      if (selectionFilters.size === 0) {
+         selectionCount.classList.add('hide');
+      } else {
+         selectionCount.classList.remove('hide');
       }
-      if (!meetsShapeFreqBarConstraint) {
-         selectionFilters.add('ShapeFreqBarConstraint');
-         return false;
-      }
-      if (!meetsSeasonFreqBarConstraint) {
-         selectionFilters.add('SeasonFreqBarConstraint');
-         return false;
-      }
-
-      return (
-         meetsTimelineFilterContraints &&
-         meetsTotdFreqBarConstraint &&
-         meetsShapeFreqBarConstraint &&
-         meetsSeasonFreqBarConstraint
-      );
-   });
-
-   updateAllVis(JSON.stringify(data) !== JSON.stringify(preData));
-
-   const selectionCount = document.getElementById('selections-count');
-   selectionCount.innerText = selectionFilters.size;
-   if (selectionFilters.size === 0) {
-      selectionCount.classList.add('hide');
-   } else {
-      selectionCount.classList.remove('hide');
-   }
+   }, debounceTimeInMS);
 };
 
 /**

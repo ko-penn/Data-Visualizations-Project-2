@@ -20,6 +20,7 @@ button {
    transition: 0.3s;
    border-radius: 0.25em;
    background-color: white;
+   border: 1px solid #ebebeb;
 }
 button:hover {
    background-color: rgb(212, 212, 212);
@@ -110,7 +111,17 @@ svg {
          position: relative;
 
          .mapCircle {
-            pointer-events: none !important;
+            pointer-events: stroke !important;
+            position: relative;
+         }
+         .mapCircle.selected:hover,
+         .mapCircle:hover {
+            stroke: orange;
+         }
+
+         .mapCircle.selected {
+            stroke: orange;
+            fill: orange;
          }
          #map-form {
             position: absolute;
