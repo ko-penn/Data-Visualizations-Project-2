@@ -13,10 +13,85 @@ export class LeafletMap {
     });
   }
 
+  addCircle() {
+    const baseRadius = 50;
+    const baseZoom = this.map._zoom;
+    const circle = L.circleMarker(this.map.getCenter(), {
+      radius: baseRadius,
+      color: "red",
+      fillOpacity: 0.2,
+    }).addTo(this.map);
+
+    const draggable = new L.Draggable(circle._path);
+    draggable.enable();
+
+    draggable.on("dragend", (e) => {
+      draggable._updatePosition();
+    });
+    draggable.on("dragend", (e) => {
+      const newX = e.target._newPos.x;
+      const newY = e.target._newPos.y;
+
+      circle.setLatLng(
+        this.map.layerPointToLatLng(
+          L.point(circle._point.x + newX, circle._point.y + newY)
+        )
+      );
+      circle._path.style.transform = "";
+
+      draggable._newPos.x = 0;
+      draggable._newPos.y = 0;
+    });
+
+    circle.on("click", () => {
+      const classes = circle._path.classList;
+      console.log(classes);
+    });
+
+    const circleObj = {
+      circle,
+      draggable,
+      baseRadius,
+      baseZoom,
+    };
+    this.filterCircles.push(circleObj);
+
+    this.myZoom = {
+      start: this.map.getZoom(),
+      end: this.map.getZoom(),
+    };
+
+    this.map.on("zoomstart", (e) => {
+      this.myZoom.start = this.map.getZoom();
+    });
+
+    this.map.on("zoomend", (e) => {
+      this.myZoom.end = this.map.getZoom();
+
+      const oldZoom = this.myZoom.start;
+      const currentZoom = this.myZoom.end;
+
+      if (oldZoom !== currentZoom) {
+        let radius = circleObj.baseRadius;
+        if (circleObj.baseZoom > currentZoom) {
+          const diff = circleObj.baseZoom - currentZoom;
+          radius /= Math.pow(2, diff);
+        } else if (circleObj.baseZoom < currentZoom) {
+          const diff = currentZoom - circleObj.baseZoom;
+          radius *= Math.pow(2, diff);
+        }
+        circleObj.circle.setRadius(radius);
+      }
+      this.map._renderer._update();
+    });
+  }
+
   /**
    * We initialize scales/axes and append static elements, such as axis titles.
    */
   initVis() {
+    this.filterCircles = [];
+
     //this is the base map layer, where we are showing the map background
     const mapLayer = mapLayerUrls[formData.mapImage];
     this.base_layer = L.tileLayer(mapLayer.url, {
@@ -58,6 +133,8 @@ export class LeafletMap {
     this.map.on("zoomend", () => {
       this.updateVis();
     });
+
+    this.addCircle();
   }
 
   updateVis() {
@@ -107,9 +184,10 @@ export class LeafletMap {
 
     //these are the city locations, displayed as a set of dots
     this.dots = this.svg
-      .selectAll("circle")
+      .selectAll("circle.data-point")
       .data(this.data.filter((d) => !isNaN(d.latitude) && !isNaN(d.longitude)))
       .join("circle")
+      .attr("class", "data-point")
       .on("mouseover", function (event, d) {
         //function to add mouseover event
         d3.select(this)
