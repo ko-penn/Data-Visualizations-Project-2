@@ -1,5 +1,3 @@
-import { LegendBuilder } from '../index.mjs';
-
 export class Histogram {
    constructor(_config, _data) {
       this.config = {
@@ -91,7 +89,7 @@ export class Histogram {
       this.dataGroup = this.chart
          .append('g')
          .attr('class', 'data-group')
-         .attr('clip-path', 'url(#clip)');
+         .attr('clip-path', `url(#${this.config.id}-clip)`);
 
       this.xScale = d3.scaleLinear().range([0, this.width]);
 
@@ -100,7 +98,7 @@ export class Histogram {
       this.xAxisG = this.chart
          .append('g')
          .attr('class', 'axis x-axis')
-         .attr('clip-path', 'url(#clip)');
+         .attr('clip-path', `url(#${this.config.id}-clip)`);
 
       this.yScale = d3.scaleLinear().range([this.height, 0]);
 
@@ -111,7 +109,7 @@ export class Histogram {
       this.clipPath = this.svg
          .append('defs')
          .append('clipPath')
-         .attr('id', 'clip')
+         .attr('id', `${this.config.id}-clip`)
          .append('rect')
          .attr('width', this.width)
          .attr('height', this.height);
@@ -148,11 +146,18 @@ export class Histogram {
             (!selectedLegendGroups || selectedLegendGroups.has(k))
       );*/
 
-      this.colorScale.domain([0,this.bins.length]);
+      this.colorScale.domain([0, this.bins.length]);
 
-      this.xScale.domain([0,d3.max(this.bins,d=>d.x1)]).range([0, this.width]);
+      this.xScale
+         .domain([0, d3.max(this.bins, (d) => d.x1)])
+         .range([0, this.width]);
       this.yScale
-         .domain([0, d3.max(this.bins, function(d) {return d.length})])
+         .domain([
+            0,
+            d3.max(this.bins, function (d) {
+               return d.length;
+            }),
+         ])
          .range([this.height, 0]);
       this.dataGroup
          .selectAll('.data-point')
@@ -162,7 +167,7 @@ export class Histogram {
          .transition()
          .attr('x', (d) => this.xScale(d.x0))
          .attr('y', (d) => this.yScale(d.length))
-         .attr('width', (d) => this.xScale(d.x1-d.x0))
+         .attr('width', (d) => this.xScale(d.x1 - d.x0))
          .attr('height', (d) => this.height - this.yScale(d.length))
          .attr('fill', (d) => this.colorScale(d.length));
 
@@ -198,7 +203,7 @@ export class Histogram {
    updateDisclaimer() {
       let total = 0;
       this.bins.forEach((c) => {
-         total = total+c.length;
+         total = total + c.length;
       });
       if (total <= 0) {
          this.disclaimer
@@ -244,9 +249,17 @@ export class Histogram {
    }
 
    buildBins() {
-      let histogram = d3.histogram()
-      .value(function(d) {return d.encounter_length})   // I need to give the vector of value
-      .domain([0,d3.max(this.data, function(d) { return d.encounter_length })]);  // then the domain of the graphic
+      let histogram = d3
+         .histogram()
+         .value(function (d) {
+            return d.encounter_length;
+         }) // I need to give the vector of value
+         .domain([
+            0,
+            d3.max(this.data, function (d) {
+               return d.encounter_length;
+            }),
+         ]); // then the domain of the graphic
       //.thresholds(70); // then the numbers of bins
 
       // And apply this function to data to get the bins
@@ -272,7 +285,8 @@ export class Histogram {
       this.chart.transition().call(this.brush.move, [0, 0]);
    }
 
-   filteredDomain(scale, min, max, singleSelect) {//how does this work
+   filteredDomain(scale, min, max, singleSelect) {
+      //how does this work
       const domainVals = scale
          .domain()
          .map((d, i) => ({
@@ -322,10 +336,9 @@ export class Histogram {
       const chartBounds = this.config.parentElement.getBoundingClientRect();
       const { pageX, pageY } = event;
 
-      const bandwidth = this.xScale(this.bins[0].x1-this.bins[0].x0);
-      const xDomainIndex = Math.ceil(
-         (event.offsetX - this.config.margin.left)/bandwidth
-      )-1;
+      const bandwidth = this.xScale(this.bins[0].x1 - this.bins[0].x0);
+      const xDomainIndex =
+         Math.ceil((event.offsetX - this.config.margin.left) / bandwidth) - 1;
 
       const domainSelection = this.bins[xDomainIndex];
       tooltip
@@ -347,11 +360,43 @@ export class Histogram {
                10 +
                'px'
          ).html(`
-            <small><strong>${domainSelection != null ? domainSelection.x0 : 'undefined'} to ${domainSelection != null ? domainSelection.x1 : 'undefined'}</strong></small>
-            <p>${domainSelection != null ? domainSelection.length : 'undefined'} Occurrence${domainSelection != null ? (domainSelection === 1 ? '' : 's') : 's'}</p>
-            <p>Average: ${domainSelection != null ? (domainSelection.length > 0 ? this.average(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
-            <p>Minimum: ${domainSelection != null ? (domainSelection.length > 0 ? this.minimum(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
-            <p>Maximum: ${domainSelection != null ? (domainSelection.length > 0 ? this.maximum(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
+            <small><strong>${
+               domainSelection != null ? domainSelection.x0 : 'undefined'
+            } to ${
+         domainSelection != null ? domainSelection.x1 : 'undefined'
+      }</strong></small>
+            <p>${
+               domainSelection != null ? domainSelection.length : 'undefined'
+            } Occurrence${
+         domainSelection != null ? (domainSelection === 1 ? '' : 's') : 's'
+      }</p>
+            <p>Average: ${
+               domainSelection != null
+                  ? domainSelection.length > 0
+                     ? this.average(
+                          domainSelection.map((d) => d.encounter_length)
+                       )
+                     : 0
+                  : 'NA'
+            }</p>
+            <p>Minimum: ${
+               domainSelection != null
+                  ? domainSelection.length > 0
+                     ? this.minimum(
+                          domainSelection.map((d) => d.encounter_length)
+                       )
+                     : 0
+                  : 'NA'
+            }</p>
+            <p>Maximum: ${
+               domainSelection != null
+                  ? domainSelection.length > 0
+                     ? this.maximum(
+                          domainSelection.map((d) => d.encounter_length)
+                       )
+                     : 0
+                  : 'NA'
+            }</p>
          `);
    }
 
@@ -361,18 +406,18 @@ export class Histogram {
          .style('pointer-events', 'none');
    }
 
-   average(data){
+   average(data) {
       let avg = data.reduce((a, b) => a + b) / data.length;
-      return(avg)
+      return avg;
    }
 
-   minimum(data){
-      let min = arr => Math.min(...arr);
-      return(min(data))
+   minimum(data) {
+      let min = (arr) => Math.min(...arr);
+      return min(data);
    }
 
-   maximum(data){
-      let max = arr => Math.max(...arr);
-      return(max(data))
+   maximum(data) {
+      let max = (arr) => Math.max(...arr);
+      return max(data);
    }
 }

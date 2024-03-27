@@ -91,7 +91,7 @@ export class Bar {
       this.dataGroup = this.chart
          .append('g')
          .attr('class', 'data-group')
-         .attr('clip-path', 'url(#clip)');
+         .attr('clip-path', `url(#${this.config.id}-clip)`);
 
       this.xScale = d3.scaleBand().range([0, this.width]).padding(0.2);
 
@@ -100,7 +100,7 @@ export class Bar {
       this.xAxisG = this.chart
          .append('g')
          .attr('class', 'axis x-axis')
-         .attr('clip-path', 'url(#clip)');
+         .attr('clip-path', `url(#${this.config.id}-clip)`);
 
       this.yScale = d3.scaleLinear().range([this.height, 0]);
 
@@ -111,7 +111,7 @@ export class Bar {
       this.clipPath = this.svg
          .append('defs')
          .append('clipPath')
-         .attr('id', 'clip')
+         .attr('id', `${this.config.id}-clip`)
          .append('rect')
          .attr('width', this.width)
          .attr('height', this.height);
@@ -359,7 +359,7 @@ export class Bar {
 
       const domainSelection =
          domain[Math.max(Math.min(xDomainIndex, domain.length - 1), 0)];
-      
+
       tooltip
          .style('pointer-events', 'all')
          .style('opacity', '1')
