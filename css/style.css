@@ -108,6 +108,10 @@ svg {
          flex-grow: 1;
          width: 100%;
          position: relative;
+
+         .mapCircle {
+            pointer-events: none !important;
+         }
          #map-form {
             position: absolute;
             bottom: 0.5em;
@@ -125,6 +129,24 @@ svg {
 
    #bar-container {
       #bar-charts-container {
+         flex-grow: 1;
+         width: 100%;
+         display: grid;
+         grid-gap: 2em;
+
+         .disclaimer {
+            opacity: 0;
+            pointer-events: none;
+            transition: 0.3s;
+            &.show {
+               opacity: 1;
+            }
+         }
+      }
+   }
+
+   #scatter-container {
+      #scatter-histogram-charts-container {
          flex-grow: 1;
          width: 100%;
          display: grid;

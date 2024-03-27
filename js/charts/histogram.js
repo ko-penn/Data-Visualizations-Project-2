@@ -1,6 +1,6 @@
 import { LegendBuilder } from '../index.mjs';
 
-export class Bar {
+export class Histogram {
    constructor(_config, _data) {
       this.config = {
          parentElementSelector: _config.parentElementSelector,
@@ -52,7 +52,7 @@ export class Bar {
          );
       }
 
-      this.buildFreqMap();
+      this.buildBins();
 
       this.setWidthAndHeight();
 
@@ -93,7 +93,7 @@ export class Bar {
          .attr('class', 'data-group')
          .attr('clip-path', 'url(#clip)');
 
-      this.xScale = d3.scaleBand().range([0, this.width]).padding(0.2);
+      this.xScale = d3.scaleLinear().range([0, this.width]);
 
       this.xAxis = d3.axisBottom().scale(this.xScale);
 
@@ -141,32 +141,31 @@ export class Bar {
    updateVis() {
       this.setWidthAndHeight();
 
-      const selectedLegendGroups = this.legendBuilder?.selectedLegendGroups;
+      /*const selectedLegendGroups = this.legendBuilder?.selectedLegendGroups;
       const freqMapKeys = Object.keys(this.freqMap).filter(
          (k) =>
             (!formData.hideFrequencyCategoriesWithoutData || this.freqMap[k]) &&
             (!selectedLegendGroups || selectedLegendGroups.has(k))
-      );
+      );*/
 
-      this.colorScale.domain(Object.keys(this.freqMap));
+      this.colorScale.domain([0,this.bins.length]);
 
-      this.xScale.domain(freqMapKeys).range([0, this.width]);
+      this.xScale.domain([0,d3.max(this.bins,d=>d.x1)]).range([0, this.width]);
       this.yScale
-         .domain([0, d3.max(freqMapKeys, (k) => this.freqMap[k])])
+         .domain([0, d3.max(this.bins, function(d) {return d.length})])
          .range([this.height, 0]);
       this.dataGroup
          .selectAll('.data-point')
-         .data(freqMapKeys)
+         .data(this.bins)
          .join('rect')
          .attr('class', 'data-point')
          .transition()
-         .attr('x', (k) => this.xScale(k))
-         .attr('y', (k) => this.yScale(this.freqMap[k]))
-         .attr('width', this.xScale.bandwidth())
-         .attr('height', (k) => this.height - this.yScale(this.freqMap[k]))
-         .attr('fill', (d) => this.colorScale(d));
+         .attr('x', (d) => this.xScale(d.x0))
+         .attr('y', (d) => this.yScale(d.length))
+         .attr('width', (d) => this.xScale(d.x1-d.x0))
+         .attr('height', (d) => this.height - this.yScale(d.length))
+         .attr('fill', (d) => this.colorScale(d.length));
 
-      this.updateLegend();
       this.updateDisclaimer();
 
       this.xAxisG.call(this.xAxis);
@@ -192,15 +191,16 @@ export class Bar {
 
    updateData(data) {
       this.data = data;
-      this.buildFreqMap();
+      this.buildBins();
       this.updateVis();
    }
 
    updateDisclaimer() {
-      const freqMapKeys = Object.keys(this.freqMap).filter(
-         (k) => !formData.hideFrequencyCategoriesWithoutData || this.freqMap[k]
-      );
-      if (freqMapKeys.length <= 0) {
+      let total = 0;
+      this.bins.forEach((c) => {
+         total = total+c.length;
+      });
+      if (total <= 0) {
          this.disclaimer
             .attr('class', 'disclaimer show')
             .attr(
@@ -212,17 +212,6 @@ export class Bar {
       } else {
          this.disclaimer.attr('class', 'disclaimer hide');
       }
-   }
-
-   intializeLegendBuilder(parentElement) {
-      this.legendBuilder = new LegendBuilder(parentElement, () => {
-         handleGlobalFilterChange();
-      });
-      this.updateLegend();
-   }
-
-   updateLegend() {
-      this.legendBuilder?.setLegendColorScale(this.colorScale);
    }
 
    setWidthAndHeight() {
@@ -254,25 +243,14 @@ export class Bar {
       });
    }
 
-   buildFreqMap() {
-      this.freqMap = {};
+   buildBins() {
+      let histogram = d3.histogram()
+      .value(function(d) {return d.encounter_length})   // I need to give the vector of value
+      .domain([0,d3.max(this.data, function(d) { return d.encounter_length })]);  // then the domain of the graphic
+      //.thresholds(70); // then the numbers of bins
 
-      let values = [];
-      if (this.config.key === 'totd') {
-         values = Object.values(timeOfTheDay);
-      } else if (this.config.key === 'ufo_shape') {
-         values = Array.from(shapes);
-      } else if (this.config.key === 'season') {
-         values = Array.from(seasons);
-      }
-
-      values.forEach((v) => {
-         this.freqMap[v] = 0;
-      });
-
-      this.data.forEach((d) => {
-         this.freqMap[d[this.config.key]]++;
-      });
+      // And apply this function to data to get the bins
+      this.bins = histogram(this.data);
    }
 
    brushing(event) {
@@ -280,20 +258,21 @@ export class Bar {
 
       event.sourceEvent?.preventDefault();
       event.sourceEvent?.stopPropagation();
+
       const singleSelect = !event.selection;
       const [s0, s1] = !singleSelect
          ? event.selection
          : [1, 2].fill(event.sourceEvent.clientX);
+
       this.selectDomainFromBrush(s0, s1, singleSelect, event);
    }
 
    clearSelection() {
       this.selectedDomain = null;
       this.chart.transition().call(this.brush.move, [0, 0]);
-      this.legendBuilder.updateSelectedLegendGroups(this.colorScale.domain());
    }
 
-   filteredDomain(scale, min, max, singleSelect) {
+   filteredDomain(scale, min, max, singleSelect) {//how does this work
       const domainVals = scale
          .domain()
          .map((d, i) => ({
@@ -320,11 +299,6 @@ export class Bar {
          s1,
          singleSelect
       );
-      this.legendBuilder.updateSelectedLegendGroups(
-         this.selectedDomain.length > 0
-            ? this.selectedDomain
-            : this.colorScale.domain()
-      );
 
       this.selection = this.snappedSelection(
          this.xScale,
@@ -348,18 +322,12 @@ export class Bar {
       const chartBounds = this.config.parentElement.getBoundingClientRect();
       const { pageX, pageY } = event;
 
-      const domain = this.xScale.domain();
+      const bandwidth = this.xScale(this.bins[0].x1-this.bins[0].x0);
       const xDomainIndex = Math.ceil(
-         (event.offsetX -
-            this.config.margin.left -
-            this.config.margin.right -
-            this.xScale.bandwidth()) /
-            this.xScale.step()
-      );
+         (event.offsetX - this.config.margin.left)/bandwidth
+      )-1;
 
-      const domainSelection =
-         domain[Math.max(Math.min(xDomainIndex, domain.length - 1), 0)];
-      
+      const domainSelection = this.bins[xDomainIndex];
       tooltip
          .style('pointer-events', 'all')
          .style('opacity', '1')
@@ -379,16 +347,32 @@ export class Bar {
                10 +
                'px'
          ).html(`
-            <small><strong>${domainSelection}</strong></small>
-            <p>${this.freqMap[domainSelection]} Occurrence${
-         this.freqMap[domainSelection] === 1 ? '' : 's'
-      }</p>
-          `);
+            <small><strong>${domainSelection != null ? domainSelection.x0 : 'undefined'} to ${domainSelection != null ? domainSelection.x1 : 'undefined'}</strong></small>
+            <p>${domainSelection != null ? domainSelection.length : 'undefined'} Occurrence${domainSelection != null ? (domainSelection === 1 ? '' : 's') : 's'}</p>
+            <p>Average: ${domainSelection != null ? (domainSelection.length > 0 ? this.average(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
+            <p>Minimum: ${domainSelection != null ? (domainSelection.length > 0 ? this.minimum(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
+            <p>Maximum: ${domainSelection != null ? (domainSelection.length > 0 ? this.maximum(domainSelection.map(d => d.encounter_length)) : 0) : 'NA'}</p>
+         `);
    }
 
    mouseLeaveTooltipCB(event) {
       d3.select('#tooltip')
          .style('opacity', '0')
          .style('pointer-events', 'none');
+   }
+
+   average(data){
+      let avg = data.reduce((a, b) => a + b) / data.length;
+      return(avg)
+   }
+
+   minimum(data){
+      let min = arr => Math.min(...arr);
+      return(min(data))
+   }
+
+   maximum(data){
+      let max = arr => Math.max(...arr);
+      return(max(data))
    }
 }
