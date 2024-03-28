@@ -84,7 +84,7 @@ export class TimelineBuilder {
       this.updateVis();
 
       this.selection = this.snappedSelection(this.xScale, [
-         Math.min(...Object.keys(this.yearCountMap)),
+         Math.max(...Object.keys(this.yearCountMap)),
       ]);
       this.chart.call(this.brush.move, this.selection);
       handleGlobalFilterChange();
@@ -166,8 +166,10 @@ export class TimelineBuilder {
          const maxYear = Math.max(...this.data.map((d) => d.year));
 
          if (minYearInSelection === maxYear) {
-            clearInterval(this.playInterval);
-            return;
+            // clearInterval(this.playInterval);
+            // return;
+            minYearInSelection =
+               Math.min(...Object.keys(this.yearCountMap)) - 1;
          }
 
          let nextClosestYear = minYearInSelection + 1;
