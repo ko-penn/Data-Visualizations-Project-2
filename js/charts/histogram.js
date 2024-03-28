@@ -50,8 +50,6 @@ export class Histogram {
          );
       }
 
-      this.buildBins();
-
       this.setWidthAndHeight();
 
       this.mainDiv
@@ -91,7 +89,7 @@ export class Histogram {
          .attr('class', 'data-group')
          .attr('clip-path', `url(#${this.config.id}-clip)`);
 
-      this.xScale = d3.scaleLinear().range([0, this.width]);
+      this.xScale = d3.scaleBand().range([0, this.width]).padding(0.2);
 
       this.xAxis = d3.axisBottom().scale(this.xScale);
 
@@ -139,6 +137,8 @@ export class Histogram {
    updateVis() {
       this.setWidthAndHeight();
 
+      this.buildBins();
+
       /*const selectedLegendGroups = this.legendBuilder?.selectedLegendGroups;
       const freqMapKeys = Object.keys(this.freqMap).filter(
          (k) =>
@@ -148,28 +148,36 @@ export class Histogram {
 
       this.colorScale.domain([0, this.bins.length]);
 
+      const xBinMap = (b) =>
+         b.min === null || b.max === null
+            ? ''
+            : b.min === b.max
+            ? b.min
+            : `${b.min} - ${b.max}`;
+
       this.xScale
-         .domain([0, d3.max(this.bins, (d) => d.x1 ?? d.x0)])
+         .domain(this.bins.map((b) => xBinMap(b)))
          .range([0, this.width]);
       this.yScale
          .domain([
             0,
-            d3.max(this.bins, function (d) {
-               return d.length;
+            d3.max(this.bins, (bin) => {
+               return bin.counts.length;
             }),
          ])
-         .range([this.height, 0]);
+         .range([this.height, 0])
+         .nice();
       this.dataGroup
          .selectAll('.data-point')
          .data(this.bins)
          .join('rect')
          .attr('class', 'data-point')
          .transition()
-         .attr('x', (d) => this.xScale(d.x0))
-         .attr('y', (d) => this.yScale(d.length))
-         .attr('width', (d) => this.xScale(d.x1 - d.x0))
-         .attr('height', (d) => this.height - this.yScale(d.length))
-         .attr('fill', (d) => this.colorScale(d.length));
+         .attr('x', (bin) => this.xScale(xBinMap(bin)))
+         .attr('y', (bin) => this.yScale(bin.counts.length))
+         .attr('width', (bin) => this.xScale.bandwidth())
+         .attr('height', (bin) => this.height - this.yScale(bin.counts.length))
+         .attr('fill', (bin, i) => this.colorScale(i));
 
       this.updateDisclaimer();
 
@@ -196,7 +204,6 @@ export class Histogram {
 
    updateData(data) {
       this.data = data;
-      this.buildBins();
       this.updateVis();
    }
 
@@ -249,21 +256,46 @@ export class Histogram {
    }
 
    buildBins() {
-      let histogram = d3
-         .histogram()
-         .value(function (d) {
-            return d.encounter_length;
-         })
-         .domain([
-            0,
-            d3.max(this.data, function (d) {
-               return d.encounter_length;
-            }),
-         ])
-         .thresholds(9);
+      const encounter_lengths = this.data
+         .filter((d) => !isNaN(d.encounter_length))
+         .map((d) => d.encounter_length);
 
-      // And apply this function to data to get the bins
-      this.bins = histogram(this.data);
+      if (encounter_lengths.length === 0) {
+         this.bins = [];
+         return;
+      }
+      if (encounter_lengths.length === 1) {
+         this.bins = [
+            {
+               counts: encounter_lengths,
+               max: encounter_lengths[0],
+               min: encounter_lengths[0],
+            },
+         ];
+         return;
+      }
+
+      const mean = d3.mean(encounter_lengths);
+      const deviation = d3.deviation(encounter_lengths);
+
+      const minLength = Math.min(...encounter_lengths);
+      const minDev = Math.floor((minLength - mean) / deviation);
+      const maxLength = Math.max(...encounter_lengths);
+      const maxDev = Math.floor((maxLength - mean) / deviation);
+
+      const numBins = maxDev - minDev;
+      const binCounts = Array.from({ length: numBins }, () => []);
+
+      encounter_lengths.forEach((length) => {
+         const dev = Math.floor((length - mean) / deviation);
+         binCounts[Math.min(dev - minDev, numBins - 1)].push(length);
+      });
+
+      this.bins = binCounts.map((counts) => ({
+         counts,
+         max: counts.length > 0 ? Math.max(...counts) : null,
+         min: counts.length > 0 ? Math.min(...counts) : null,
+      }));
    }
 
    brushing(event) {

@@ -253,8 +253,8 @@ globalThis.handleGlobalFilterChange = () => {
          }
 
          if (
-            map.filterCircles.length > 0 &&
-            !map.filterCircles.some((c) => {
+            map?.filterCircles.length > 0 &&
+            !map?.filterCircles.some((c) => {
                if (
                   d.latitude !== undefined &&
                   !isNaN(d.latitude) &&
