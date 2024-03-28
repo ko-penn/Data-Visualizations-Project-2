@@ -111,7 +111,8 @@ svg {
          position: relative;
 
          .mapCircle {
-            pointer-events: stroke !important;
+            pointer-events: all !important;
+            cursor: move;
             position: relative;
          }
          .mapCircle.selected:hover,

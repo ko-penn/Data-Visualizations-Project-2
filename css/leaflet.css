@@ -647,3 +647,11 @@ svg.leaflet-image-layer.leaflet-interactive path {
    margin-left: -12px;
    border-right-color: #fff;
 }
+
+.leaflet-overlay-pane svg:first-child {
+   z-index: 100000 !important;
+   pointer-events: none;
+   * {
+      pointer-events: auto;
+   }
+}

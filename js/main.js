@@ -18,7 +18,7 @@ async function main() {
    setTimeout(() => {
       initializeCharts();
       initializeEventListeners();
-   }, 500);
+   }, 50);
 }
 
 function processData() {
@@ -169,6 +169,9 @@ function clearGlobalFilters() {
    shapeFreqBar && shapeFreqBar.clearSelection();
    seasonFreqBar && seasonFreqBar.clearSelection();
    encounterLengthFreqBar && encounterLengthFreqBar.clearSelection();
+
+   // Map Chart
+   map && map.clearSelection();
 
    handleGlobalFilterChange();
 }

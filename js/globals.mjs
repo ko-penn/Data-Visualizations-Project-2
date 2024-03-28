@@ -198,9 +198,15 @@ globalThis.handleGlobalFilterChange = () => {
    // Debounce globalFilterChanges so repeat calls done refilter data erroneously
    if (globalFilterChangeTimeout) clearTimeout(globalFilterChangeTimeout);
 
-   const debounceTimeInMS = 500;
+   const debounceTimeInMS = 50;
    globalFilterChangeTimeout = setTimeout(() => {
       const selectionFilters = new Set();
+
+      // Add all filter circles
+      map?.filterCircles.forEach((c, i) =>
+         selectionFilters.add(`map-circle-${i}`)
+      );
+
       const preData = [...data];
       data = processedData.filter((d) => {
          // Timeline chart
@@ -243,6 +249,36 @@ globalThis.handleGlobalFilterChange = () => {
 
          if (!meetsEncounterHistogramConstraint) {
             selectionFilters.add('EncounterHistogramConstraint');
+            return false;
+         }
+
+         if (
+            map.filterCircles.length > 0 &&
+            !map.filterCircles.some((c) => {
+               if (
+                  d.latitude !== undefined &&
+                  !isNaN(d.latitude) &&
+                  d.longitude !== undefined &&
+                  !isNaN(d.longitude)
+               ) {
+                  const pointCenter = map.map.latLngToContainerPoint(
+                     c.circle.getLatLng()
+                  );
+                  const pointDatapoint = map.map.latLngToContainerPoint(
+                     L.latLng(d.latitude, d.longitude)
+                  );
+                  const radius = c.circle.getRadius();
+
+                  const distance = Math.sqrt(
+                     Math.pow(Math.abs(pointCenter.x - pointDatapoint.x), 2) +
+                        Math.pow(Math.abs(pointCenter.y - pointDatapoint.y), 2)
+                  );
+
+                  return distance <= radius;
+               }
+               return false;
+            })
+         ) {
             return false;
          }
 

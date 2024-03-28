@@ -39,7 +39,7 @@ export class LeafletMap {
       selectedCircle.circle.setRadius(radius);
 
       this.map._renderer._update();
-      // handleGlobalFilterChange();
+      handleGlobalFilterChange();
    }
 
    addCircle() {
@@ -70,7 +70,6 @@ export class LeafletMap {
          const classes = circle._path.classList;
          if (!classes.contains('selected')) {
             this.setSelectedCircle(circleObj);
-            classes.add('selected');
          }
       });
       draggable.on('dragend', (e) => {
@@ -91,29 +90,22 @@ export class LeafletMap {
          if (classes.contains('selected')) {
             requestAnimationFrame(() => {
                this.setSelectedCircle(circleObj);
-               classes.add('selected');
             });
          }
+
+         handleGlobalFilterChange();
       });
       circle.on('click', (e) => {
+         this.triggeredCircleClick = true;
          e.originalEvent.stopPropagation();
          const classes = circle._path.classList;
          if (classes.contains('selected')) {
             this.setSelectedCircle(null);
-            classes.remove('selected');
          } else {
             this.setSelectedCircle(circleObj);
-            classes.add('selected');
          }
       });
 
-      this.myZoom = {
-         start: this.map.getZoom(),
-         end: this.map.getZoom(),
-      };
-      this.map.on('zoomstart', (e) => {
-         this.myZoom.start = this.map.getZoom();
-      });
       this.map.on('zoomend', (e) => {
          this.myZoom.end = this.map.getZoom();
 
@@ -171,6 +163,25 @@ export class LeafletMap {
          layers: [this.base_layer],
       });
 
+      this.myZoom = {
+         start: this.map.getZoom(),
+         end: this.map.getZoom(),
+      };
+      this.map.on('zoomstart', (e) => {
+         this.myZoom.start = this.map.getZoom();
+      });
+
+      this.map.on('click', (e) => {
+         requestAnimationFrame(() => {
+            if (this.triggeredCircleClick) {
+               this.triggeredCircleClick = false;
+               return;
+            }
+            e.originalEvent.stopPropagation();
+            this.setSelectedCircle(null);
+         });
+      });
+
       //if you stopped here, you would just have a map
 
       //initialize svg for d3 to add to map
@@ -182,8 +193,6 @@ export class LeafletMap {
       this.map.on('zoomend', () => {
          this.updateVis();
       });
-
-      this.addCircle();
    }
 
    updateVis() {
@@ -304,6 +313,20 @@ export class LeafletMap {
    }
 
    setSelectedCircle(value) {
+      this.filterCircles.forEach((c) => {
+         if (c !== value) {
+            c.circle._path.classList.remove('selected');
+         } else {
+            c.circle._path.classList.add('selected');
+         }
+      });
       mapFormBuilder.setSelectedCircle(value);
+   }
+
+   clearSelection() {
+      const filterCirclesClone = [...this.filterCircles];
+      filterCirclesClone.forEach((c) => {
+         this.removeCircle(c);
+      });
    }
 }

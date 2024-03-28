@@ -149,7 +149,7 @@ export class Histogram {
       this.colorScale.domain([0, this.bins.length]);
 
       this.xScale
-         .domain([0, d3.max(this.bins, (d) => d.x1)])
+         .domain([0, d3.max(this.bins, (d) => d.x1 ?? d.x0)])
          .range([0, this.width]);
       this.yScale
          .domain([
@@ -258,8 +258,9 @@ export class Histogram {
             0,
             d3.max(this.data, function (d) {
                return d.encounter_length;
-            })
-         ]).thresholds(9);
+            }),
+         ])
+         .thresholds(9);
 
       // And apply this function to data to get the bins
       this.bins = histogram(this.data);
@@ -286,11 +287,13 @@ export class Histogram {
 
    filteredDomain(scale, min, max, singleSelect) {
       const bandwidth = this.xScale(this.bins[0].x1 - this.bins[0].x0);
-      const x0Index =
-         Math.ceil((min) / bandwidth) - 1;
-      const x1Index = 
-         Math.ceil((max) / bandwidth) - 1;
-      return ([this.bins[x0Index].x0,this.bins[x1Index].x1]);
+      const x0Index = Math.ceil(min / bandwidth) - 1;
+      const x1Index = Math.ceil(max / bandwidth) - 1;
+
+      const bin0 = this.bins[x0Index];
+      const bin1 = this.bins[x1Index];
+
+      return bin0 && bin1 ? [bin0.x0, bin1.x1] : null;
    }
 
    /*snappedSelection(bandScale, domain) { //not sure what this does
@@ -360,7 +363,11 @@ export class Histogram {
             <p>${
                domainSelection != null ? domainSelection.length : 'undefined'
             } Occurrence${
-         domainSelection != null ? (domainSelection.length === 1 ? '' : 's') : 's'
+         domainSelection != null
+            ? domainSelection.length === 1
+               ? ''
+               : 's'
+            : 's'
       }</p>
             <p>Average: ${
                domainSelection != null
