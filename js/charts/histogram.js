@@ -363,11 +363,22 @@ export class Histogram {
       const chartBounds = this.config.parentElement.getBoundingClientRect();
       const { pageX, pageY } = event;
 
-      const bandwidth = this.xScale(this.bins[0].x1 - this.bins[0].x0);
-      const xDomainIndex =
-         Math.ceil((event.offsetX - this.config.margin.left) / bandwidth) - 1;
+      const domain = this.xScale.domain();
+      let xDomainIndex = Math.ceil(
+         (event.offsetX -
+            this.config.margin.left -
+            this.config.margin.right -
+            this.xScale.bandwidth()) /
+            this.xScale.step()
+      );
 
-      const domainSelection = this.bins[xDomainIndex];
+      if(xDomainIndex===-0){
+         xDomainIndex = 0;
+      }
+
+      const domainSelection =
+         domain[Math.max(Math.min(xDomainIndex, domain.length - 1), 0)];
+
       tooltip
          .style('pointer-events', 'all')
          .style('opacity', '1')
@@ -388,44 +399,38 @@ export class Histogram {
                'px'
          ).html(`
             <small><strong>${
-               domainSelection != null ? domainSelection.x0 : 'undefined'
-            } to ${
-         domainSelection != null ? domainSelection.x1 : 'undefined'
-      }</strong></small>
+               domainSelection != null ? domainSelection : 'undefined'
+            }</strong></small>
             <p>${
-               domainSelection != null ? domainSelection.length : 'undefined'
+               domainSelection != null ? this.bins[xDomainIndex].counts.length : 'undefined'
             } Occurrence${
          domainSelection != null
-            ? domainSelection.length === 1
+            ? this.bins[xDomainIndex].counts.length === 1
                ? ''
                : 's'
             : 's'
       }</p>
             <p>Average: ${
                domainSelection != null
-                  ? domainSelection.length > 0
+                  ? this.bins[xDomainIndex].counts.length > 0
                      ? this.average(
-                          domainSelection.map((d) => d.encounter_length)
+                        this.bins[xDomainIndex].counts
                        )
-                     : 0
+                     : 'NA'
                   : 'NA'
             }</p>
             <p>Minimum: ${
                domainSelection != null
-                  ? domainSelection.length > 0
-                     ? this.minimum(
-                          domainSelection.map((d) => d.encounter_length)
-                       )
-                     : 0
+                  ? this.bins[xDomainIndex].counts.length > 0
+                     ? this.bins[xDomainIndex].min
+                     : 'NA'
                   : 'NA'
             }</p>
             <p>Maximum: ${
                domainSelection != null
-                  ? domainSelection.length > 0
-                     ? this.maximum(
-                          domainSelection.map((d) => d.encounter_length)
-                       )
-                     : 0
+                  ? this.bins[xDomainIndex].counts.length > 0
+                     ? this.bins[xDomainIndex].max
+                     : 'NA'
                   : 'NA'
             }</p>
          `);
