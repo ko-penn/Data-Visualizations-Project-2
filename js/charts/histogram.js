@@ -124,6 +124,23 @@ export class Histogram {
       .attr("font-weight", "bold")
       .text(`No data points for selection`);
 
+    this.overallText = this.svg
+      .append("g")
+      .attr("class", "overall-mean")
+      .attr("text-anchor", "end");
+    this.overallMean = this.overallText
+      .append("text")
+      .attr("fill", "black")
+      .attr("font-size", ".75em")
+      .attr("font-weight", "bold")
+      .text(`Overall Mean: ${this.mean}`);
+    this.overallDeviation = this.overallText
+      .append("text")
+      .attr("fill", "black")
+      .attr("font-size", ".75em")
+      .attr("font-weight", "bold")
+      .text(`Overall Deviation: ${this.deviation}`);
+
     this.colorScale = d3.scaleOrdinal(d3.schemeTableau10);
 
     this.updateVis();
@@ -173,6 +190,7 @@ export class Histogram {
       .attr("fill", (bin, i) => this.colorScale(i));
 
     this.updateDisclaimer();
+    this.updateOverallText();
 
     this.xAxisG.call(this.xAxis);
     this.yAxisG.call(this.yAxis);
@@ -219,6 +237,20 @@ export class Histogram {
     }
   }
 
+  updateOverallText() {
+    this.overallText.attr(
+      "transform",
+      `translate(${this.width + this.config.margin.left}, ${
+        this.config.margin.top
+      })`
+    );
+
+    this.overallMean.text(`Overall Mean: ${this.mean.toFixed(2)}`);
+    this.overallDeviation
+      .attr("transform", `translate(0, 12)`)
+      .text(`Standard Deviation: ${this.deviation.toFixed(2)}`);
+  }
+
   setWidthAndHeight() {
     const svg = document.getElementById(this.config.id)?.querySelector("svg");
     if (svg) {
@@ -253,36 +285,39 @@ export class Histogram {
       .filter((d) => !isNaN(d.encounter_length))
       .map((d) => d.encounter_length);
 
-    if (encounter_lengths.length === 0) {
-      this.bins = [];
-      return;
-    }
-    if (encounter_lengths.length === 1) {
-      this.bins = [
-        {
-          counts: encounter_lengths,
-          stdFromMean: 0,
-          max: encounter_lengths[0],
-          min: encounter_lengths[0],
-        },
-      ];
-      return;
-    }
+    this.mean = d3.mean(encounter_lengths);
+    this.deviation = d3.deviation(encounter_lengths);
 
-    const mean = d3.mean(encounter_lengths);
-    const deviation = d3.deviation(encounter_lengths);
+    if (encounter_lengths.length <= 1) {
+      this.mean = this.mean ?? 0;
+      this.deviation = this.deviation ?? 0;
+      this.bins = encounter_lengths.map((l) => {
+        return {
+          counts: [l],
+          stdFromMean: 0,
+          max: l,
+          min: l,
+        };
+      });
+      return;
+    }
 
     const minLength = Math.min(...encounter_lengths);
-    const minDev = Math.round((minLength - mean) / deviation);
+    const minDev = Math.round((minLength - this.mean) / this.deviation);
     const maxLength = Math.max(...encounter_lengths);
-    const maxDev = Math.round((maxLength - mean) / deviation);
+    const maxDev = Math.round((maxLength - this.mean) / this.deviation);
 
     const numBins = maxDev - minDev;
     const binCounts = Array.from({ length: numBins }, () => []);
 
+    if (binCounts.length === 0) {
+      return;
+    }
+
     encounter_lengths.forEach((length) => {
-      const dev = Math.round((length - mean) / deviation);
-      binCounts[Math.min(dev - minDev, numBins - 1)].push(length);
+      const dev = Math.round((length - this.mean) / this.deviation);
+      const index = Math.min(dev - minDev, binCounts.length - 1);
+      binCounts[isNaN(index) ? 0 : index].push(length);
     });
 
     this.bins = binCounts.map((counts, i) => ({
