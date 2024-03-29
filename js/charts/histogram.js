@@ -318,20 +318,14 @@ export class Histogram {
    }
 
    filteredDomain(scale, min, max, singleSelect) {
-      const bandwidth = this.xScale(this.bins[0].x1 - this.bins[0].x0);
-      const x0Index = Math.ceil(min / bandwidth) - 1;
-      const x1Index = Math.ceil(max / bandwidth) - 1;
-
+      const x0Index = Math.ceil(min / (scale.step())) - 1;
+      const x1Index = Math.ceil(max / (scale.step())) - 1;
       const bin0 = this.bins[x0Index];
       const bin1 = this.bins[x1Index];
 
-      return bin0 && bin1 ? [bin0.x0, bin1.x1] : null;
+      return bin0 && bin1 ? [bin0.min, bin1.max] : null;
    }
 
-   /*snappedSelection(bandScale, domain) { //not sure what this does
-      const domainVals = domain.map((d) => bandScale(d));
-      return [d3.min(domainVals), d3.max(domainVals) + bandScale.bandwidth()];
-   }*/
 
    selectDomainFromBrush(s0, s1, singleSelect, event) {
       this.selectedDomain = this.filteredDomain(
@@ -341,13 +335,7 @@ export class Histogram {
          singleSelect
       );
 
-      /*this.selection = this.snappedSelection( //not sure what this does
-         this.xScale,
-         this.selectedDomain
-      ).map((d) => (isNaN(d) || d === undefined ? -1 : d));*/
-
       if (event && event.sourceEvent && event.type === 'end') {
-         /*this.chart.transition().call(event.target.move, this.selection);*/ //not sure what this does
          this.updateVis();
       }
       handleGlobalFilterChange();
@@ -366,11 +354,9 @@ export class Histogram {
       const domain = this.xScale.domain();
       let xDomainIndex = Math.ceil(
          (event.offsetX -
-            this.config.margin.left -
-            this.config.margin.right -
-            this.xScale.bandwidth()) /
+            this.config.margin.left )/
             this.xScale.step()
-      );
+      -1);
 
       if(xDomainIndex===-0){
          xDomainIndex = 0;
@@ -399,19 +385,19 @@ export class Histogram {
                'px'
          ).html(`
             <small><strong>${
-               domainSelection != null ? domainSelection : 'undefined'
+               domainSelection != null && this.bins[xDomainIndex] != null ? domainSelection : 'undefined'
             }</strong></small>
             <p>${
-               domainSelection != null ? this.bins[xDomainIndex].counts.length : 'undefined'
+               this.bins[xDomainIndex] != null ? this.bins[xDomainIndex].counts.length : 'undefined'
             } Occurrence${
-         domainSelection != null
-            ? this.bins[xDomainIndex].counts.length === 1
-               ? ''
-               : 's'
-            : 's'
+               this.bins[xDomainIndex] != null
+                  ? this.bins[xDomainIndex].counts.length === 1
+                     ? ''
+                     : 's'
+                  : 's'
       }</p>
             <p>Average: ${
-               domainSelection != null
+               this.bins[xDomainIndex] != null
                   ? this.bins[xDomainIndex].counts.length > 0
                      ? this.average(
                         this.bins[xDomainIndex].counts
@@ -420,14 +406,14 @@ export class Histogram {
                   : 'NA'
             }</p>
             <p>Minimum: ${
-               domainSelection != null
+               this.bins[xDomainIndex] != null
                   ? this.bins[xDomainIndex].counts.length > 0
                      ? this.bins[xDomainIndex].min
                      : 'NA'
                   : 'NA'
             }</p>
             <p>Maximum: ${
-               domainSelection != null
+               this.bins[xDomainIndex] != null
                   ? this.bins[xDomainIndex].counts.length > 0
                      ? this.bins[xDomainIndex].max
                      : 'NA'
