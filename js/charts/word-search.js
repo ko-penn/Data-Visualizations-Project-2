@@ -50,5 +50,53 @@ export class WordSearch {
                 `${this.config.parentElementSelector} #${this.config.id}`
             );
         }
+
+
+        this.buildFreqMap();
+
+        this.setWidthAndHeight();
+
+        this.mainDiv
+         .append('p')
+         .attr('class', 'y-axis-title')
+         .style('grid-area', 'y')
+         .style('writing-mode', 'vertical-rl')
+         .style('text-orientation', 'mixed')
+         .style('text-align', 'center')
+         .style('transform', 'rotate(180deg)')
+         .text(this.config.yAxisTitle);
+
+         this.mainDiv
+         .append('p')
+         .attr('class', 'x-axis-title')
+         .style('grid-area', 'x')
+         .style('text-align', 'center')
+         .text(this.config.xAxisTitle);
+
+         this.svg = this.mainDiv
+         .append('svg')
+         .attr('height', '100%')
+         .attr('width', '100%')
+         .style('grid-area', 'chart');
+
+         this.chart = this.svg
+         .append('g')
+         .attr(
+            'transform',
+            `translate(${this.config.margin.left},${
+               this.config.margin.top / 2
+            })`
+         );
+
+         this.dataGroup = this.chart
+         .append('g')
+         .attr('class', 'data-group')
+         .attr('clip-path', `url(#${this.config.id}-clip)`);
+
+         
     }
+
+    
+
+
 }
