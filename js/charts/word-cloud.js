@@ -15,6 +15,7 @@ export class WordCloud {
     }
 
 
+
     initVis(){
         
       this.mainDiv = d3
@@ -40,7 +41,6 @@ export class WordCloud {
          'grid-template-rows',
          'repeat(4, 1fr) repeat(2, max-content)'
          );
-        
 
       this.svg = this.mainDiv
       .append('svg')
@@ -51,61 +51,165 @@ export class WordCloud {
       this.updateVis();
     }
 
-    updateData(data) {
+   updateData(data) {
       this.data = data;
       this.updateVis();
    }
 
-    updateVis(){
-      var allWordsArray = this.data.map(d => d.description);
-      var allWords = allWordsArray.join(' ');
-      var cleanedWords = this.remove_stopwords(allWords);
-      var myWords = this.wordFrequency(cleanedWords);
-      console.log(myWords);
-      var layout = d3.layout.cloud()
-         .size([this.width, this.height])
-         .words(myWords.map(function(d){return {text:d.word, size:d.size}}))
-         .padding(5)
-         .rotate(function(){return ~~(Math.random()*2)*90;})
-         .fontSize(function(d){return d.size})
-         .on("end", this.draw);
-      layout.start();
-        
-    }
+   updateVis() {
+      const stopwords = [
+         'i',
+         'me',
+         'my',
+         'myself',
+         'we',
+         'our',
+         'ours',
+         'ourselves',
+         'you',
+         'your',
+         'yours',
+         'yourself',
+         'yourselves',
+         'he',
+         'him',
+         'his',
+         'himself',
+         'she',
+         'her',
+         'hers',
+         'herself',
+         'it',
+         'its',
+         'itself',
+         'they',
+         'them',
+         'their',
+         'theirs',
+         'themselves',
+         'what',
+         'which',
+         'who',
+         'whom',
+         'this',
+         'that',
+         'these',
+         'those',
+         'am',
+         'is',
+         'are',
+         'was',
+         'were',
+         'be',
+         'been',
+         'being',
+         'have',
+         'has',
+         'had',
+         'having',
+         'do',
+         'does',
+         'did',
+         'doing',
+         'a',
+         'an',
+         'the',
+         'and',
+         'but',
+         'if',
+         'or',
+         'because',
+         'as',
+         'until',
+         'while',
+         'of',
+         'at',
+         'by',
+         'for',
+         'with',
+         'about',
+         'against',
+         'between',
+         'into',
+         'through',
+         'during',
+         'before',
+         'after',
+         'above',
+         'below',
+         'to',
+         'from',
+         'up',
+         'down',
+         'in',
+         'out',
+         'on',
+         'off',
+         'over',
+         'under',
+         'again',
+         'further',
+         'then',
+         'once',
+         'here',
+         'there',
+         'when',
+         'where',
+         'why',
+         'how',
+         'all',
+         'any',
+         'both',
+         'each',
+         'few',
+         'more',
+         'most',
+         'other',
+         'some',
+         'such',
+         'no',
+         'nor',
+         'not',
+         'only',
+         'own',
+         'same',
+         'so',
+         'than',
+         'too',
+         'very',
+         's',
+         't',
+         'can',
+         'will',
+         'just',
+         'don',
+         'should',
+         'now',
+      ];
+      const wordCounts = {};
 
-    draw(words){
-      this.svg
-    }
+      this.data.forEach((d) => {
+         d.description.split(' ').forEach((word) => {
+            const word_clean = words.split('.').join('').toLowerCase();
+            if (!stopwords.includes(word_clean)) {
+               if (!wordCounts[word_clean]) {
+                  wordCounts[word_clean] = 0;
+               }
+               wordCounts[word_clean]++;
+            }
+         });
+      });
 
+      console.log(wordCounts);
+      // var layout = d3.layout.cloud()
+      //    .size([this.width, this.height])
+      //    .words(myWords.map(function(d){return {text:d.word, size:d.size}}))
+      //    .padding(5)
+      //    .rotate(function(){return ~~(Math.random()*2)*90;})
+      //    .fontSize(function(d){return d.size})
+      //    .on("end", this.draw);
+      // layout.start();
+   }
 
-    
-
-   wordFrequency(str){
-    var wordArray = str.split(/[ .?!,*'"]/);
-    var newArray = [], wordObj;
-    wordArray.forEach(function (word) {
-       wordObj = newArray.filter(function (w){
-          return w.text == word;
-       });
-       if (wordObj.length) {
-          wordObj[0].size += 1;
-       } else {
-          newArray.push({text: word, size: 1});
-       }
-    });
-    return newArray;
- }
-
- remove_stopwords(str) {
-    var stopwords = ['i','me','my','myself','we','our','ours','ourselves','you','your','yours','yourself','yourselves','he','him','his','himself','she','her','hers','herself','it','its','itself','they','them','their','theirs','themselves','what','which','who','whom','this','that','these','those','am','is','are','was','were','be','been','being','have','has','had','having','do','does','did','doing','a','an','the','and','but','if','or','because','as','until','while','of','at','by','for','with','about','against','between','into','through','during','before','after','above','below','to','from','up','down','in','out','on','off','over','under','again','further','then','once','here','there','when','where','why','how','all','any','both','each','few','more','most','other','some','such','no','nor','not','only','own','same','so','than','too','very','s','t','can','will','just','don','should','now']
-    var res = []
-    var words = str.split(' ')
-    for(var i=0;i<words.length;i++) {
-       var word_clean = words[i].split(".").join("").toLowerCase();
-       if(!stopwords.includes(word_clean)) {
-           res.push(word_clean)
-       }
-    }
-    return(res.join(' '))
-}
+   draw(words) {}
 }
