@@ -5,6 +5,7 @@ export class WordCloud {
           parentElement: document.querySelector(_config.parentElementSelector),
           margin: _config.margin || { top: 25, right: 25, bottom: 25, left: 45 },
        };
+       id: _config.id,
        this.data = _data;
        this.initVis();
  
@@ -50,17 +51,7 @@ export class WordCloud {
          .append('svg')
          .attr('height', '100%')
          .attr('width', '100%')
-         .style('grid-area', 'chart');
-
-        this.chart = this.svg
-         .append('g')
-         .attr(
-            'transform',
-            `translate(${this.config.margin.left},${
-               this.config.margin.top / 2
-            })`
-         );
-        
+         .style('grid-area', 'chart');  
 
         this.updateVis();
     }
@@ -88,7 +79,7 @@ export class WordCloud {
     }
 
     draw(words){
-
+      this.svg
     }
 
 
