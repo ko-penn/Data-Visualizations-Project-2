@@ -60,6 +60,10 @@ button:hover {
          }
       }
 
+      a {
+         text-decoration: none;
+      }
+
       #info {
          border: 1px solid #ebebeb;
          display: flex;

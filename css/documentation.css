@@ -1,0 +1,25 @@
+.requirements {
+   border-bottom: 1px solid #ebebeb;
+   ul {
+      padding: 0 1em 1em 1em;
+      list-style: inside;
+   }
+}
+
+section {
+   border-bottom: 1px solid #ebebeb;
+   .content {
+      padding: 0 1em 1em 1em;
+   }
+}
+
+summary {
+   padding: 1em;
+   ::marker {
+      transform: translateY(-10px);
+   }
+   h2 {
+      display: inline;
+      line-height: 1;
+   }
+}
