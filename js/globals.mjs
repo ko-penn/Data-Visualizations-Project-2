@@ -1,4 +1,4 @@
-import { Bar, Histogram, LeafletMap } from './charts/index.mjs';
+import { Bar, Histogram, LeafletMap, WordCloud } from './charts/index.mjs';
 import { MapFormBuilder } from './index.mjs';
 
 // ---------- Data variables ----------
@@ -136,6 +136,12 @@ globalThis.seasonFreqBar = null;
  */
 globalThis.encounterLengthFreqBar = null;
 
+/**
+ * @type {(WordCloud | null)}
+ * Object for encounter length freq bar chart instance
+ */
+globalThis.wordCloud = null;
+
 // ---------- Helper functions ----------
 
 /**
@@ -181,12 +187,14 @@ globalThis.updateAllVis = (dataChange) => {
       shapeFreqBar?.updateData(data);
       seasonFreqBar?.updateData(data);
       encounterLengthFreqBar?.updateData(data);
+      wordCloud?.updateData(data);
    } else {
       map?.updateVis();
       totdFreqBar?.updateVis();
       shapeFreqBar?.updateVis();
       seasonFreqBar?.updateVis();
       encounterLengthFreqBar?.updateVis();
+      wordCloud?.updateVis();
    }
 };
 

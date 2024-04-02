@@ -1,4 +1,4 @@
-import { Bar, Histogram, LeafletMap } from "./charts/index.mjs";
+import { Bar, Histogram, LeafletMap, WordCloud } from "./charts/index.mjs";
 import { MapFormBuilder, TimelineBuilder } from "./helpers/index.mjs";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -148,6 +148,12 @@ function initializeCharts() {
   // Build scatter plot charts
 
   // Build word cloud
+  wordCloud = new WordCloud(
+    {
+      parentElementSelector: "word-cloud-diagram-container"
+    },
+    data
+  )
 }
 
 function initializeBuilders() {
