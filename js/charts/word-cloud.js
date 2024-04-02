@@ -5,7 +5,7 @@ export class WordCloud {
           parentElement: document.querySelector(_config.parentElementSelector),
           margin: _config.margin || { top: 25, right: 25, bottom: 25, left: 45 },
        };
-       id: _config.id,
+
        this.data = _data;
        this.initVis();
  
@@ -16,44 +16,39 @@ export class WordCloud {
 
 
     initVis(){
-        const idInParent = document.querySelector(this.config.id);
-        if (!idInParent) {
-            this.mainDiv = d3
-                .select(this.config.parentElementSelector)
-                .append('div')
-                .attr('height', '100%')
-                .attr('width', '100%')
-                .attr('id', this.config.id)
-                .style('display', 'grid')
-                .style(
-                'grid-template-areas',
-                `
-                    "y chart chart chart chart"
-                    "y chart chart chart chart"
-                    "y chart chart chart chart"
-                    "y chart chart chart chart"
-                    ". x x x x"
-                    ". legend legend legend legend"
-                `
-                )
-                .style('grid-template-columns', 'max-content repeat(4, 1fr)')
-                .style(
-                'grid-template-rows',
-                'repeat(4, 1fr) repeat(2, max-content)'
-                );
-        } else {
-            this.mainDiv = d3.select(
-                `${this.config.parentElementSelector} #${this.config.id}`
-            );
-        }
-
-        this.svg = this.mainDiv
-         .append('svg')
+        
+      this.mainDiv = d3
+         .select(this.config.parentElementSelector)
+         .append('div')
          .attr('height', '100%')
          .attr('width', '100%')
-         .style('grid-area', 'chart');  
+         .attr('id', this.config.id)
+         .style('display', 'grid')
+         .style(
+         'grid-template-areas',
+         `
+            "y chart chart chart chart"
+            "y chart chart chart chart"
+            "y chart chart chart chart"
+            "y chart chart chart chart"
+            ". x x x x"
+            ". legend legend legend legend"
+         `
+         )
+         .style('grid-template-columns', 'max-content repeat(4, 1fr)')
+         .style(
+         'grid-template-rows',
+         'repeat(4, 1fr) repeat(2, max-content)'
+         );
+        
 
-        this.updateVis();
+      this.svg = this.mainDiv
+      .append('svg')
+      .attr('height', '100%')
+      .attr('width', '100%')
+      .style('grid-area', 'chart');  
+
+      this.updateVis();
     }
 
     updateData(data) {
@@ -67,14 +62,14 @@ export class WordCloud {
       var cleanedWords = this.remove_stopwords(allWords);
       var myWords = this.wordFrequency(cleanedWords);
       console.log(myWords);
-      // var layout = d3.layout.cloud()
-      //    .size([this.width, this.height])
-      //    .words(myWords.map(function(d){return {text:d.word, size:d.size}}))
-      //    .padding(5)
-      //    .rotate(function(){return ~~(Math.random()*2)*90;})
-      //    .fontSize(function(d){return d.size})
-      //    .on("end", this.draw);
-      // layout.start();
+      var layout = d3.layout.cloud()
+         .size([this.width, this.height])
+         .words(myWords.map(function(d){return {text:d.word, size:d.size}}))
+         .padding(5)
+         .rotate(function(){return ~~(Math.random()*2)*90;})
+         .fontSize(function(d){return d.size})
+         .on("end", this.draw);
+      layout.start();
         
     }
 
