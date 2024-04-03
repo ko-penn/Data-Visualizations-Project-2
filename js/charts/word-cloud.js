@@ -9,9 +9,6 @@ export class WordCloud {
       this.data = _data;
       this.initVis();
 
-      this.data = _data;
-      this.initVis();
-
       window.addEventListener('resize', () => {
          this.updateVis();
       });
@@ -32,6 +29,12 @@ export class WordCloud {
          );
       }
 
+      this.svg = this.mainDiv
+         .append('svg')
+         .attr('height', '100%')
+         .attr('width', '100%')
+         .style('grid-area', 'chart');
+
       this.chart = this.svg
          .append('g')
          .attr(
@@ -45,11 +48,9 @@ export class WordCloud {
 
       this.layout
          .on('end', (e, b) => {
-            // console.log('end', e, b);
             this.draw(e);
          })
          .on('word', (e) => {
-            // console.log('word', e);
          });
 
       this.updateVis();
@@ -208,7 +209,7 @@ export class WordCloud {
       });
 
       const keys = Object.keys(wordCounts);
-      const maxNumOfWords = 10;
+      const maxNumOfWords = 100;
       const sortedKeys = keys
          .sort((a, b) => wordCounts[b] - wordCounts[a])
          .slice(0, maxNumOfWords);
@@ -228,6 +229,7 @@ export class WordCloud {
          .rotate(function () {
             return ~~(Math.random() * 2) * 90;
          })
+         .font('Impact')
          .fontSize(function (d) {
             return d.size;
          })
@@ -237,7 +239,6 @@ export class WordCloud {
 
    draw(words) {
       if (words.length === 0) return;
-
       this.chart
          .selectAll('g')
          .nodes()
