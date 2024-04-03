@@ -156,10 +156,68 @@
          <details open>
             <summary><h2>Sketches</h2></summary>
             <div class="content">
-               <i>
-                  This time, include a section with your design sketches and
-                  design justifications.
-               </i>
+               <div class="code-structure">
+                  <div class="code-section">
+                     <div class="code-image-block">
+                        <p>
+                           This is the general layout we came up with by essentially following the order of the project goals.
+                        </p>
+                        <img src="./images/sketches/Layout.png" />
+                     </div>
+                     <div class="code-image-block">
+                        <p>
+                           This was our map layout for the C-goals. As we added to the project we decided to add a zoom in and out feature in the top left corner of the map as well as the Add Selection Circle to the Filter/Map bar.
+                        </p>
+                        <img src="./images/sketches/Map.png" />
+                     </div>
+                     <div class="code-image-block">
+                        <p>
+                           The timeline is pinned to the bottom of the screen. We only used one color for the bars because the timeline is meant mostly for brushing and not discovering specific trends. The play and pause button allow the user to see the data year by year in all of the visualizations.
+                        </p>
+                        <img src="./images/sketches/Timeline.png" />
+                     </div>
+                     <div class="code-image-block">
+                        <p>
+                           The time of the day bar chart has a bar for morning, afternoon, evening, and night. The bars are defined by this logic, morning is between hours 6 and 12, afternoon is between 12 and 18, evening is between 18 and 21, and night is between 21 and 6.
+                        </p>
+                        <img src="./images/sketches/Totd.png" />
+                     </div>
+
+                     <div class="code-image-block">
+                        <p>
+                           The shape bar chart has a bar for every described shape in the selected data. 
+                        </p>
+                        <img src="./images/sketches/Shape.png" />
+                     </div>
+
+                     <div class="code-image-block">
+                        <p>
+                           The season bar chart has a bar for each season. The bars are defined by this logic, Winter is between months 11 and 1, Spring is between 2 and 4, Summer is between 5 and 7, and Fall is between 8 and 10.
+                        </p>
+                        <img src="./images/sketches/Season.png" />
+                     </div>
+                  </div>
+               </div>
+               <p>
+                  Each bar chart has a legend that allows the user to select or deselect which bars are shown.
+               </p>
+               <div class="code-structure">
+                  <div class="code-section">
+                     <div class="code-image-block">
+                        <p>
+                           For the encounter length histogram we decided to use standard deviations to define the X-axis bins. For example, if there is a range of 32 standard deviations in the selected data then there are 32 bins that define the bars.
+                        </p>
+                        <img src="./images/sketches/Encounter.png" />
+                     </div>
+
+                     <div class="code-image-block">
+                        <p>
+                           The word cloud finds the most frequently used words and displays the most frequent largest and the least frequent smallest. We decided to only use one color for the words because we are already using size to show frequency.
+                        </p>
+                        <img src="./images/sketches/Word.png" />
+                     </div>
+                  </div>
+               </div>
             </div>
          </details>
       </section>
