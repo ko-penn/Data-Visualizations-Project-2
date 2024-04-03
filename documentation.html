@@ -1,393 +1,479 @@
 <!DOCTYPE html>
 <html lang="en">
-   <head>
-      <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Project 2 - Documentation</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Project 2 - Documentation</title>
 
-      <link rel="preconnect" href="https://fonts.googleapis.com" />
-      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-      <link
-         href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-         rel="stylesheet"
-      />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
 
-      <link rel="stylesheet" href="css/style.css" />
-      <link rel="stylesheet" href="css/documentation.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/documentation.css" />
 
-      <script
-         src="https://kit.fontawesome.com/ce1e161f8c.js"
-         crossorigin="anonymous"
-      ></script>
-   </head>
-   <body>
-      <div id="header">
-         <div class="lhs">
-            <div class="top">
-               <h1>Project 2 - The truth is out there!</h1>
-            </div>
-            <div class="bottom">
-               <p>By Devin Harris, Alex Yang, and Kody Penn</p>
-            </div>
-         </div>
-
-         <div class="rhs">
-            <a target="_blank" href="./index.html">
-               <button id="info">
-                  Visualization
-                  <i class="fas fa-external-link-alt"></i>
-               </button>
-            </a>
-         </div>
+    <script
+      src="https://kit.fontawesome.com/ce1e161f8c.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="header">
+      <div class="lhs">
+        <div class="top">
+          <h1>Project 2 - The truth is out there!</h1>
+        </div>
+        <div class="bottom">
+          <p>By Devin Harris, Alex Yang, and Kody Penn</p>
+        </div>
       </div>
 
-      <details open class="requirements">
-         <summary><h2>Requirements</h2></summary>
+      <div class="rhs">
+        <button onclick="collapseAll()">Collapse All</button>
+        <button onclick="expandAll()">Expand All</button>
+        <a target="_blank" href="./index.html">
+          <button id="info">
+            Visualization
+            <i class="fas fa-external-link-alt"></i>
+          </button>
+        </a>
+      </div>
+    </div>
 
-         <ul>
-            <li>
-               Explain the motivation for your application. What can it allow
-               someone to understand?
-            </li>
-            <li>
-               1 section on the data: Describe the data and include a link.
-            </li>
-            <li>
-               1 section on the visualization components: Explain each view of
-               the data, the GUI, etc. Explain how you can interact with your
-               application, and how the views update in response to these
-               interactions.
-            </li>
-            <li>
-               This time, include a section with your design sketches and design
-               justifications.
-            </li>
-            <li>
-               1 section on what your application enables you to discover:
-               Present some findings you arrive at with your application.
-            </li>
-            <li>
-               1 section on your process- what libraries did you use? How did
-               you structure your code? How can you access it and run it? Link
-               to your code (and the live application, if it is deployed
-               online).
-            </li>
-            <li>
-               Include a 2-3 minute demo video, showing your application in
-               action. The easiest way to record this is with a screen capture
-               tool, which also captures audio- such as Quicktime. Use a
-               voiceover or video captions to explain your application. Demo
-               videos should be sufficient on their own, but can reference your
-               documentation. Include the name of the project, your name, the
-               project components, and how your application works. You can
-               present it on your webpage or on youtube, but linked on your
-               webpage.
-            </li>
-            <li>
-               This time, document who on your team did which component of the
-               project. Ex. If someone worked on the data, and on bar charts,
-               list their effort on these components.
-            </li>
-         </ul>
+    <details open class="requirements">
+      <summary><h2>Requirements</h2></summary>
+
+      <ul>
+        <li>
+          Explain the motivation for your application. What can it allow someone
+          to understand?
+        </li>
+        <li>1 section on the data: Describe the data and include a link.</li>
+        <li>
+          1 section on the visualization components: Explain each view of the
+          data, the GUI, etc. Explain how you can interact with your
+          application, and how the views update in response to these
+          interactions.
+        </li>
+        <li>
+          This time, include a section with your design sketches and design
+          justifications.
+        </li>
+        <li>
+          1 section on what your application enables you to discover: Present
+          some findings you arrive at with your application.
+        </li>
+        <li>
+          1 section on your process- what libraries did you use? How did you
+          structure your code? How can you access it and run it? Link to your
+          code (and the live application, if it is deployed online).
+        </li>
+        <li>
+          Include a 2-3 minute demo video, showing your application in action.
+          The easiest way to record this is with a screen capture tool, which
+          also captures audio- such as Quicktime. Use a voiceover or video
+          captions to explain your application. Demo videos should be sufficient
+          on their own, but can reference your documentation. Include the name
+          of the project, your name, the project components, and how your
+          application works. You can present it on your webpage or on youtube,
+          but linked on your webpage.
+        </li>
+        <li>
+          This time, document who on your team did which component of the
+          project. Ex. If someone worked on the data, and on bar charts, list
+          their effort on these components.
+        </li>
+      </ul>
+    </details>
+
+    <section>
+      <details open>
+        <summary>
+          <h2>Motivation</h2>
+        </summary>
+        <div class="content">
+          <i>
+            Our visualizations allow users to see ufo sightings distributed
+            through time and space. Users can also seek answers to certain
+            questions they may have. For example, how many ufo sightings have
+            there been in my home town in the last 5 years. The frequency charts
+            allow for easy discovery of trends.
+          </i>
+        </div>
       </details>
+    </section>
 
-      <section>
-         <details open>
-            <summary>
-               <h2>Motivation</h2>
-            </summary>
-            <div class="content">
-               <i>
-                  Our visualizations allow users to see ufo sightings
-                  distributed through time and space. Users can also seek
-                  answers to certain questions they may have. For example, how
-                  many ufo sightings have there been in my home town in the last
-                  5 years. The frequency charts allow for easy discovery of
-                  trends.
-               </i>
+    <section>
+      <details open>
+        <summary><h2>Data</h2></summary>
+        <div class="content">
+          <i>
+            The data set includes 80,332 ufo sightings across the world from
+            1906 to 2014. Every sighting has the date and time, city, state, and
+            country of the sighting. The sightings also have the encounter
+            length, descritpion, date documented, and coordinates. The data set
+            can be found
+            <a
+              target="_blank"
+              href="https://github.com/rfordatascience/tidytuesday/tree/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2019/2019-06-25"
+              >here</a
+            >.
+          </i>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Visualization Components</h2></summary>
+        <div class="content">
+          <div class="vis-view">
+            <h4>Timeline</h4>
+            <img src="./images/visualComponents/timeline.png" />
+            <p>
+              The timeline allows for narrowing down the visualized data to 1 or
+              more years. It is fixed to the bottom and filters data on all
+              other chart types. You can also use the timeline to see how the
+              number of occurences increases over time and even play/pause to
+              show data form each year at different time intervals. Finally you
+              can mark the checkbox to hide years without data because there are
+              some gaps in the provided data that cause no datapoints to show on
+              some graphs which can be alarming in some cases.
+            </p>
+          </div>
+          <div class="vis-view">
+            <h4>Map</h4>
+            <img src="./images/visualComponents/map.png" />
+            <p>
+              The map shows the geographical location of each sighting and
+              allows for zooming and panning. Built of the leaflet library you
+              can also change the underlying map layer and well as add selection
+              circles which allow you to filter out data that does not fall
+              within the bounds of at least one selection circle. You can even
+              drag and resize these circles and there position and radius
+              persist as you zoom and pan. These circle selections also apply
+              global filters so other charts are affected by these selections.
+            </p>
+          </div>
+          <div class="vis-view">
+            <h4>Frequency Bar Charts</h4>
+            <img src="./images/visualComponents/freqs.png" />
+            <p>
+              The frequency bar charts display three different bar charts. The
+              charts group the data points by the sightings "time of the day",
+              "UFO Shape", and "Season". These charts show the number of
+              sightings that match each type within those groups. You can also
+              brush within these charts and filter the data to only the points
+              that fall within the selections of your brush. So you can
+              highlight the "Night" time of day and all other charts will only
+              show datapoints where the "totd" field is "Night". You can see the
+              brush selection also applies to the legend, where you can click
+              the swatches to toggle specific pieces of the domain if you want
+              to filter non adjacent items from the bar charts. The bar charts
+              section also has a checkbox for hiding data groups that have no
+              data. So in the above screenshot "fall" is not on the xaxis of the
+              Season chart because there are no datapoints in the current
+              selection that match that constraint. Turning that aforementioned
+              checkbox off will display that on the xaxis with no bar and
+              constrain the widths of the other bars accordingly.
+            </p>
+          </div>
+          <div class="vis-view">
+            <h4>Histogram</h4>
+            <img src="./images/visualComponents/histogram.png" />
+            <p>
+              The histogram shows the normal distribution of the encounter
+              lengths of each sighting. It does this by calculating the mean and
+              the standard deviation of the overall data selection. We then draw
+              a rectangle for each deviation and how many datapoints fall into
+              those deviations. In the above screenshot you also see the tooltip
+              shows the number of occurences said deviations away from overall
+              mean, the minimum datapoint in the group and the maximum datapoint
+              in the group as well as the average of the overall group. You can
+              again brush in this chart to filter the data to only the
+              datapoints that fall inside the groups you select. This can be
+              useful for reducing outliers affects on the histogram by selecting
+              the datapoints near the 0 deviation group so a more apparent bell
+              curve can be seen. These brushings again affect all other charts
+              as well.
+            </p>
+          </div>
+          <div class="vis-view">
+            <h4>Word Cloud</h4>
+            <img src="./images/visualComponents/WordCloud.png" />
+            <p>
+              This word cloud visualizes the top 100 most common words (removing
+              stop words) in the various UFO report descriptions. The cloud will
+              update as users make various filtering selections in the map, bar
+              graph, and/or timeline
+            </p>
+          </div>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Sketches</h2></summary>
+        <div class="content">
+          <div class="code-structure">
+            <div class="code-section">
+              <div class="code-image-block">
+                <p>
+                  This is the general layout we came up with by essentially
+                  following the order of the project goals.
+                </p>
+                <img src="./images/sketches/Layout.png" />
+              </div>
+              <div class="code-image-block">
+                <p>
+                  This was our map layout for the C-goals. As we added to the
+                  project we decided to add a zoom in and out feature in the top
+                  left corner of the map as well as the Add Selection Circle to
+                  the Filter/Map bar.
+                </p>
+                <img src="./images/sketches/Map.png" />
+              </div>
+              <div class="code-image-block">
+                <p>
+                  The timeline is pinned to the bottom of the screen. We only
+                  used one color for the bars because the timeline is meant
+                  mostly for brushing and not discovering specific trends. The
+                  play and pause button allow the user to see the data year by
+                  year in all of the visualizations.
+                </p>
+                <img src="./images/sketches/Timeline.png" />
+              </div>
+              <div class="code-image-block">
+                <p>
+                  The time of the day bar chart has a bar for morning,
+                  afternoon, evening, and night. The bars are defined by this
+                  logic, morning is between hours 6 and 12, afternoon is between
+                  12 and 18, evening is between 18 and 21, and night is between
+                  21 and 6.
+                </p>
+                <img src="./images/sketches/Totd.png" />
+              </div>
+
+              <div class="code-image-block">
+                <p>
+                  The shape bar chart has a bar for every described shape in the
+                  selected data.
+                </p>
+                <img src="./images/sketches/Shape.png" />
+              </div>
+
+              <div class="code-image-block">
+                <p>
+                  The season bar chart has a bar for each season. The bars are
+                  defined by this logic, Winter is between months 11 and 1,
+                  Spring is between 2 and 4, Summer is between 5 and 7, and Fall
+                  is between 8 and 10.
+                </p>
+                <img src="./images/sketches/Season.png" />
+              </div>
             </div>
-         </details>
-      </section>
+          </div>
+          <p>
+            Each bar chart has a legend that allows the user to select or
+            deselect which bars are shown.
+          </p>
+          <div class="code-structure">
+            <div class="code-section">
+              <div class="code-image-block">
+                <p>
+                  For the encounter length histogram we decided to use standard
+                  deviations to define the X-axis bins. For example, if there is
+                  a range of 32 standard deviations in the selected data then
+                  there are 32 bins that define the bars.
+                </p>
+                <img src="./images/sketches/Encounter.png" />
+              </div>
 
-      <section>
-         <details open>
-            <summary><h2>Data</h2></summary>
-            <div class="content">
-               <i>
-                  The data set includes 80,332 ufo sightings across the world
-                  from 1906 to 2014. Every sighting has the date and time, city,
-                  state, and country of the sighting. The sightings also have
-                  the encounter length, descritpion, date documented, and
-                  coordinates. The data set can be found
-                  <a
-                     target="_blank"
-                     href="https://github.com/rfordatascience/tidytuesday/tree/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2019/2019-06-25"
-                     >here</a
-                  >.
-               </i>
+              <div class="code-image-block">
+                <p>
+                  The word cloud finds the most frequently used words and
+                  displays the most frequent largest and the least frequent
+                  smallest. We decided to only use one color for the words
+                  because we are already using size to show frequency.
+                </p>
+                <img src="./images/sketches/Word.png" />
+              </div>
             </div>
-         </details>
-      </section>
+          </div>
+        </div>
+      </details>
+    </section>
 
-      <section>
-         <details open>
-            <summary><h2>Visualization Components</h2></summary>
-            <div class="content">
-               <div class="vis-view">
-                  <h4>Timeline</h4>
-               </div>
-               <div class="vis-view">
-                  <h4>Map</h4>
-               </div>
-               <div class="vis-view">
-                  <h4>Frequency Bar Charts</h4>
-               </div>
-               <div class="vis-view">
-                  <h4>Histogram</h4>
-               </div>
-               <div class="vis-view">
-                  <h4>Word Cloud</h4>
-                  <img src="./images/visualComponents/WordCloud.png"/>
-                  <p>This word cloud visualizes the top 100 most common words in the various UFO report descriptions. The cloud will update as users make various filtering selections in the map, bar graph, and/or timeline</p>
-               </div>
+    <section>
+      <details open>
+        <summary><h2>Discovery</h2></summary>
+        <div class="content">
+          <i>
+            56.9% of all reported sightings occurred at night. The next highest
+            being 23.4% in the evening. The most commonly reported UFO shape is
+            light. Sightings are fairly well distributed by season, Fall: 27%,
+            Winter 20%, Spring 20%, Summer 33%. The top 3 most used words in
+            sighting descriptions are lights, light, and bright. For any given
+            year most of the sightings are in the U.S.
+          </i>
+        </div>
+      </details>
+    </section>
+
+    <section>
+      <details open>
+        <summary><h2>Process</h2></summary>
+        <div class="content">
+          <p>
+            For libraries we used d3js, d3-cloud, and leaflet. d3 was mainly
+            used in building the bar charts and allowed for brushing techniques.
+            d3-cloud was specifically for generating the word cloud and
+            similarly leaflet was used specifically for the map.
+          </p>
+
+          <div class="code-structure">
+            <h4>Our code was structured in the following way:</h4>
+
+            <div class="code-section">
+              <div class="code-image-block">
+                <p>
+                  First our main function collects all the data from the csv,
+                  processes said data, then initializes all the charts and event
+                  listeners.
+                </p>
+                <img src="./images/code/main.png" />
+              </div>
+              <div class="code-image-block">
+                <p>
+                  The processData function loops over all the rawData from the
+                  csv and does some type casting and build some calculated
+                  fields like the totd, season, year, month, hour, and other
+                  fields we are interested in visualizing.
+                </p>
+                <img src="./images/code/data-processing.png" />
+              </div>
+              <div class="code-image-block">
+                <p>
+                  The eventListeners in this case are for when the timeline is
+                  collapsed, the bar chart sections
+                  hideFrequencyCategoriesWithoutData toggle is changed, and when
+                  the clear selections button is clicked.
+                </p>
+                <img src="./images/code/event-listeners.png" />
+              </div>
+
+              <div class="code-image-block">
+                <p>
+                  We also had a globals file that stored all global variables
+                  that would be shared across different chart types. These
+                  variables include the rawData from the csv, the processedData
+                  which is the rawData with calculated fields and type casting,
+                  then the actual data which is the filtered down version of the
+                  processedData based on brush selections.
+                </p>
+                <img src="./images/code/data-variables.png" />
+              </div>
+
+              <div class="code-image-block">
+                <p>
+                  We also had global variables for all the chart instances. This
+                  makes it easier to access any chart from anywhere in the code
+                  and makes it especially easy to trigger updateVis method from
+                  other chart interactions.
+                </p>
+                <img src="./images/code/chart-variables.png" />
+              </div>
+
+              <div class="code-image-block">
+                <p>
+                  Finally, there were also a few helper functions defined
+                  globally. The main two of note are the updateAllVis and
+                  handleGlobalFilterChange. These functions handle calling the
+                  updateVis/updateData on all the charts, and applying new
+                  filtering logic to the processedData to send to the chart
+                  instances on some brush selections or timeline change. Another
+                  interesting concept is debouncing the
+                  handleGlobalFilterChange. Because all the charts call this,
+                  making sure frequent potentially duplicated calls dont trigger
+                  unessecary processing, a debounce was implemented to basically
+                  wait 50ms after a call to this method is made and if no new
+                  call is made in that time it does the processing.
+                </p>
+                <img src="./images/code/helper-variables.png" />
+              </div>
             </div>
-         </details>
-      </section>
+          </div>
 
-      <section>
-         <details open>
-            <summary><h2>Sketches</h2></summary>
-            <div class="content">
-               <div class="code-structure">
-                  <div class="code-section">
-                     <div class="code-image-block">
-                        <p>
-                           This is the general layout we came up with by essentially following the order of the project goals.
-                        </p>
-                        <img src="./images/sketches/Layout.png" />
-                     </div>
-                     <div class="code-image-block">
-                        <p>
-                           This was our map layout for the C-goals. As we added to the project we decided to add a zoom in and out feature in the top left corner of the map as well as the Add Selection Circle to the Filter/Map bar.
-                        </p>
-                        <img src="./images/sketches/Map.png" />
-                     </div>
-                     <div class="code-image-block">
-                        <p>
-                           The timeline is pinned to the bottom of the screen. We only used one color for the bars because the timeline is meant mostly for brushing and not discovering specific trends. The play and pause button allow the user to see the data year by year in all of the visualizations.
-                        </p>
-                        <img src="./images/sketches/Timeline.png" />
-                     </div>
-                     <div class="code-image-block">
-                        <p>
-                           The time of the day bar chart has a bar for morning, afternoon, evening, and night. The bars are defined by this logic, morning is between hours 6 and 12, afternoon is between 12 and 18, evening is between 18 and 21, and night is between 21 and 6.
-                        </p>
-                        <img src="./images/sketches/Totd.png" />
-                     </div>
+          <p>
+            Of course there are lots of more interesting areas, such as the
+            chart implementations themselves and how the timeline plays on a
+            setInterval, but I will leave that for you to investigate in our
+            sourcecode!
+          </p>
+          <br />
+          <p>
+            You can access the source code
+            <a
+              target="_blank"
+              href="https://github.com/ko-penn/Data-Visualizations-Project-2"
+            >
+              here
+            </a>
+            and run it simply in VSCode with the live preview extension on the
+            index.html file. You can also see the live version
+            <a target="_blank" href="https://cs5124project2.netlify.app/"
+              >here</a
+            >.
+          </p>
+        </div>
+      </details>
+    </section>
 
-                     <div class="code-image-block">
-                        <p>
-                           The shape bar chart has a bar for every described shape in the selected data. 
-                        </p>
-                        <img src="./images/sketches/Shape.png" />
-                     </div>
+    <section>
+      <details open>
+        <summary><h2>Demo</h2></summary>
+        <div class="content">
+          <i>
+            Include a 2-3 minute demo video, showing your application in action.
+            The easiest way to record this is with a screen capture tool, which
+            also captures audio- such as Quicktime. Use a voiceover or video
+            captions to explain your application. Demo videos should be
+            sufficient on their own, but can reference your documentation.
+            Include the name of the project, your name, the project components,
+            and how your application works. You can present it on your webpage
+            or on youtube, but linked on your webpage.
+          </i>
+        </div>
+      </details>
+    </section>
 
-                     <div class="code-image-block">
-                        <p>
-                           The season bar chart has a bar for each season. The bars are defined by this logic, Winter is between months 11 and 1, Spring is between 2 and 4, Summer is between 5 and 7, and Fall is between 8 and 10.
-                        </p>
-                        <img src="./images/sketches/Season.png" />
-                     </div>
-                  </div>
-               </div>
-               <p>
-                  Each bar chart has a legend that allows the user to select or deselect which bars are shown.
-               </p>
-               <div class="code-structure">
-                  <div class="code-section">
-                     <div class="code-image-block">
-                        <p>
-                           For the encounter length histogram we decided to use standard deviations to define the X-axis bins. For example, if there is a range of 32 standard deviations in the selected data then there are 32 bins that define the bars.
-                        </p>
-                        <img src="./images/sketches/Encounter.png" />
-                     </div>
+    <section>
+      <details open>
+        <summary><h2>Contributions</h2></summary>
+        <div class="content">
+          <p><b>Devin Harris</b>: Map, Timeline, Frequency Bar Charts</p>
+          <p><b>Kody Penn</b>:</p>
+          <p><b>Alex Yang</b>: Word Cloud</p>
+        </div>
+      </details>
+    </section>
 
-                     <div class="code-image-block">
-                        <p>
-                           The word cloud finds the most frequently used words and displays the most frequent largest and the least frequent smallest. We decided to only use one color for the words because we are already using size to show frequency.
-                        </p>
-                        <img src="./images/sketches/Word.png" />
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </details>
-      </section>
+    <script>
+      function collapseAll() {
+        Array.from(document.querySelectorAll("details")).forEach((element) => {
+          element.open = false;
+        });
+      }
 
-      <section>
-         <details open>
-            <summary><h2>Discovery</h2></summary>
-            <div class="content">
-               <i>
-                  56.9% of all reported sightings occurred at night. The next
-                  highest being 23.4% in the evening. The most commonly reported
-                  UFO shape is light. Sightings are fairly well distributed by
-                  season, Fall: 27%, Winter 20%, Spring 20%, Summer 33%. The top
-                  3 most used words in sighting descriptions are lights, light,
-                  and bright.
-               </i>
-            </div>
-         </details>
-      </section>
-
-      <section>
-         <details open>
-            <summary><h2>Process</h2></summary>
-            <div class="content">
-               <p>
-                  For libraries we used d3js, d3-cloud, and leaflet. d3 was
-                  mainly used in building the bar charts and allowed for
-                  brushing techniques. d3-cloud was specifically for generating
-                  the word cloud and similarly leaflet was used specifically for
-                  the map.
-               </p>
-
-               <div class="code-structure">
-                  <h4>Our code was structured in the following way:</h4>
-
-                  <div class="code-section">
-                     <div class="code-image-block">
-                        <p>
-                           First our main function collects all the data from
-                           the csv, processes said data, then initializes all
-                           the charts and event listeners.
-                        </p>
-                        <img src="./images/code/main.png" />
-                     </div>
-                     <div class="code-image-block">
-                        <p>
-                           The processData function loops over all the rawData
-                           from the csv and does some type casting and build
-                           some calculated fields like the totd, season, year,
-                           month, hour, and other fields we are interested in
-                           visualizing.
-                        </p>
-                        <img src="./images/code/data-processing.png" />
-                     </div>
-                     <div class="code-image-block">
-                        <p>
-                           The eventListeners in this case are for when the
-                           timeline is collapsed, the bar chart sections
-                           hideFrequencyCategoriesWithoutData toggle is changed,
-                           and when the clear selections button is clicked.
-                        </p>
-                        <img src="./images/code/event-listeners.png" />
-                     </div>
-
-                     <div class="code-image-block">
-                        <p>
-                           We also had a globals file that stored all global
-                           variables that would be shared across different chart
-                           types. These variables include the rawData from the
-                           csv, the processedData which is the rawData with
-                           calculated fields and type casting, then the actual
-                           data which is the filtered down version of the
-                           processedData based on brush selections.
-                        </p>
-                        <img src="./images/code/data-variables.png" />
-                     </div>
-
-                     <div class="code-image-block">
-                        <p>
-                           We also had global variables for all the chart
-                           instances. This makes it easier to access any chart
-                           from anywhere in the code and makes it especially
-                           easy to trigger updateVis method from other chart
-                           interactions.
-                        </p>
-                        <img src="./images/code/chart-variables.png" />
-                     </div>
-
-                     <div class="code-image-block">
-                        <p>
-                           Finally, there were also a few helper functions
-                           defined globally. The main two of note are the
-                           updateAllVis and handleGlobalFilterChange. These
-                           functions handle calling the updateVis/updateData on
-                           all the charts, and applying new filtering logic to
-                           the processedData to send to the chart instances on
-                           some brush selections or timeline change. Another
-                           interesting concept is debouncing the
-                           handleGlobalFilterChange. Because all the charts call
-                           this, making sure frequent potentially duplicated
-                           calls dont trigger unessecary processing, a debounce
-                           was implemented to basically wait 50ms after a call
-                           to this method is made and if no new call is made in
-                           that time it does the processing.
-                        </p>
-                        <img src="./images/code/helper-variables.png" />
-                     </div>
-                  </div>
-               </div>
-
-               <p>
-                  Of course there are lots of more interesting areas, such as
-                  the chart implementations themselves and how the timeline
-                  plays on a setInterval, but I will leave that for you to
-                  investigate in our sourcecode!
-               </p>
-               <br />
-               <p>
-                  You can access the source code
-                  <a
-                     target="_blank"
-                     href="https://github.com/ko-penn/Data-Visualizations-Project-2"
-                  >
-                     here
-                  </a>
-                  and run it simply in VSCode with the live preview extension on
-                  the index.html file. You can also see the live version
-                  <a target="_blank" href="https://cs5124project2.netlify.app/"
-                     >here</a
-                  >.
-               </p>
-            </div>
-         </details>
-      </section>
-
-      <section>
-         <details open>
-            <summary><h2>Demo</h2></summary>
-            <div class="content">
-               <i>
-                  Include a 2-3 minute demo video, showing your application in
-                  action. The easiest way to record this is with a screen
-                  capture tool, which also captures audio- such as Quicktime.
-                  Use a voiceover or video captions to explain your application.
-                  Demo videos should be sufficient on their own, but can
-                  reference your documentation. Include the name of the project,
-                  your name, the project components, and how your application
-                  works. You can present it on your webpage or on youtube, but
-                  linked on your webpage.
-               </i>
-            </div>
-         </details>
-      </section>
-
-      <section>
-         <details open>
-            <summary><h2>Contributions</h2></summary>
-            <div class="content">
-               <i>
-                  This time, document who on your team did which component of
-                  the project. Ex. If someone worked on the data, and on bar
-                  charts, list their effort on these components.
-               </i>
-               <p><b>Devin Harris</b>:</p>
-               <p><b>Kody Penn</b>:</p>
-               <p><b>Alex Yang</b>: Word Cloud</p>
-            </div>
-         </details>
-      </section>
-   </body>
+      function expandAll() {
+        Array.from(document.querySelectorAll("details")).forEach((element) => {
+          element.open = true;
+        });
+      }
+    </script>
+  </body>
 </html>
