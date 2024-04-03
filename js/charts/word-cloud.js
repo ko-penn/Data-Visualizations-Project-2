@@ -9,6 +9,9 @@ export class WordCloud {
       this.data = _data;
       this.initVis();
 
+      this.data = _data;
+      this.initVis();
+
       window.addEventListener('resize', () => {
          this.updateVis();
       });
@@ -28,11 +31,6 @@ export class WordCloud {
             `${this.config.parentElementSelector} #${this.config.id}`
          );
       }
-
-      this.svg = this.mainDiv
-         .append('svg')
-         .attr('height', '100%')
-         .attr('width', '100%');
 
       this.chart = this.svg
          .append('g')
