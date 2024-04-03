@@ -4,6 +4,7 @@ export class WordCloud {
          parentElementSelector: _config.parentElementSelector,
          parentElement: document.querySelector(_config.parentElementSelector),
          margin: _config.margin || { top: 25, right: 25, bottom: 25, left: 45 },
+         id: _config.id,
       };
       this.data = _data;
       this.initVis();
@@ -19,26 +20,9 @@ export class WordCloud {
          this.mainDiv = d3
             .select(this.config.parentElementSelector)
             .append('div')
-            .attr('height', '100%')
-            .attr('width', '100%')
-            .attr('id', this.config.id)
-            .style('display', 'grid')
-            .style(
-               'grid-template-areas',
-               `
-                    "y chart chart chart chart"
-                    "y chart chart chart chart"
-                    "y chart chart chart chart"
-                    "y chart chart chart chart"
-                    ". x x x x"
-                    ". legend legend legend legend"
-                `
-            )
-            .style('grid-template-columns', 'max-content repeat(4, 1fr)')
-            .style(
-               'grid-template-rows',
-               'repeat(4, 1fr) repeat(2, max-content)'
-            );
+            .style('height', '100%')
+            .style('width', '100%')
+            .attr('id', this.config.id);
       } else {
          this.mainDiv = d3.select(
             `${this.config.parentElementSelector} #${this.config.id}`
@@ -48,8 +32,7 @@ export class WordCloud {
       this.svg = this.mainDiv
          .append('svg')
          .attr('height', '100%')
-         .attr('width', '100%')
-         .style('grid-area', 'chart');
+         .attr('width', '100%');
 
       this.chart = this.svg
          .append('g')
@@ -60,6 +43,17 @@ export class WordCloud {
             })`
          );
 
+      this.layout = d3.layout.cloud();
+
+      this.layout
+         .on('end', (e, b) => {
+            // console.log('end', e, b);
+            this.draw(e);
+         })
+         .on('word', (e) => {
+            // console.log('word', e);
+         });
+
       this.updateVis();
    }
 
@@ -69,6 +63,8 @@ export class WordCloud {
    }
 
    updateVis() {
+      this.setWidthAndHeight();
+
       const stopwords = [
          'i',
          'me',
@@ -197,12 +193,13 @@ export class WordCloud {
          'don',
          'should',
          'now',
+         '',
       ];
       const wordCounts = {};
 
       this.data.forEach((d) => {
          d.description.split(' ').forEach((word) => {
-            const word_clean = words.split('.').join('').toLowerCase();
+            const word_clean = word.split('.').join('').toLowerCase();
             if (!stopwords.includes(word_clean)) {
                if (!wordCounts[word_clean]) {
                   wordCounts[word_clean] = 0;
@@ -212,16 +209,81 @@ export class WordCloud {
          });
       });
 
-      console.log(wordCounts);
-      // var layout = d3.layout.cloud()
-      //    .size([this.width, this.height])
-      //    .words(myWords.map(function(d){return {text:d.word, size:d.size}}))
-      //    .padding(5)
-      //    .rotate(function(){return ~~(Math.random()*2)*90;})
-      //    .fontSize(function(d){return d.size})
-      //    .on("end", this.draw);
-      // layout.start();
+      const keys = Object.keys(wordCounts);
+      const maxNumOfWords = 10;
+      const sortedKeys = keys
+         .sort((a, b) => wordCounts[b] - wordCounts[a])
+         .slice(0, maxNumOfWords);
+
+      const maxWordCount = wordCounts[sortedKeys[0]];
+      const maxWordSize = 100;
+      const wordCountSizeRatio = maxWordSize / maxWordCount;
+
+      this.layout.stop();
+      this.layout
+         .size([this.width ?? 1, this.height ?? 1])
+         .words(
+            sortedKeys.map(function (k) {
+               return { text: k, size: wordCounts[k] * wordCountSizeRatio };
+            })
+         )
+         .rotate(function () {
+            return ~~(Math.random() * 2) * 90;
+         })
+         .fontSize(function (d) {
+            return d.size;
+         })
+         .padding(5);
+      this.layout.start();
    }
 
-   draw(words) {}
+   draw(words) {
+      if (words.length === 0) return;
+
+      this.chart
+         .selectAll('g')
+         .nodes()
+         .forEach((n) => n.remove());
+
+      this.chart
+         .append('g')
+         .attr(
+            'transform',
+            'translate(' +
+               this.layout.size()[0] / 2 +
+               ',' +
+               this.layout.size()[1] / 2 +
+               ')'
+         )
+         .selectAll('text')
+         .data(words)
+         .enter()
+         .append('text')
+         .style('font-size', function (d) {
+            return d.size;
+         })
+         .style('fill', '#69b3a2')
+         .attr('text-anchor', 'middle')
+         .style('font-family', 'Impact')
+         .attr('transform', function (d) {
+            return 'translate(' + [d.x, d.y] + ')rotate(' + d.rotate + ')';
+         })
+         .text(function (d) {
+            return d.text;
+         });
+   }
+
+   setWidthAndHeight() {
+      const svg = document.getElementById(this.config.id)?.querySelector('svg');
+      if (svg) {
+         this.width =
+            svg.getBoundingClientRect().width -
+            this.config.margin.left -
+            this.config.margin.right;
+         this.height =
+            svg.getBoundingClientRect().height -
+            this.config.margin.top -
+            this.config.margin.bottom;
+      }
+   }
 }
