@@ -8,9 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
 async function main() {
    rawData = await d3.csv('data/ufo_sightings.csv');
 
-   // TODO: this should be removed, only added to speed up development since lots of dots get laggy
-   // rawData = rawData.slice(0, 2000);
-
    processData();
    initializeBuilders();
 

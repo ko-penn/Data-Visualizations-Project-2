@@ -23,3 +23,31 @@ summary {
       line-height: 1;
    }
 }
+
+.vis-view {
+   margin: 1em 0;
+}
+
+.code-structure {
+   margin: 1em 0;
+   width: 100%;
+
+   .code-section {
+      margin: 1em 0;
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-gap: 1em;
+      grid-auto-flow: dense;
+      .code-image-block {
+         p {
+            flex-grow: 1;
+            margin-bottom: 0.5em;
+         }
+         img {
+            width: 100%;
+            margin: 0 auto;
+         }
+      }
+   }
+}

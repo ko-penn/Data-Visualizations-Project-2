@@ -98,11 +98,12 @@
             </summary>
             <div class="content">
                <i>
-                  Our visualizations allow users to see ufo sightings distributed 
-                  through time and space. Users can also seek answers to certain 
-                  questions they may have. For example, how many ufo sightings have 
-                  there been in my home town in the last 5 years. The frequency charts 
-                  allow for easy discovery of trends.
+                  Our visualizations allow users to see ufo sightings
+                  distributed through time and space. Users can also seek
+                  answers to certain questions they may have. For example, how
+                  many ufo sightings have there been in my home town in the last
+                  5 years. The frequency charts allow for easy discovery of
+                  trends.
                </i>
             </div>
          </details>
@@ -113,10 +114,16 @@
             <summary><h2>Data</h2></summary>
             <div class="content">
                <i>
-                  The data set includes 80,332 ufo sightings across the world from 1906 to 2014. Every sighting has the 
-                  date and time, city, state, and country of the sighting. The sightings 
-                  also have the encounter length, descritpion, date documented, and coordinates.
-                  The data set can be found <a target="_blank" href="https://github.com/rfordatascience/tidytuesday/tree/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2019/2019-06-25">here</a>.
+                  The data set includes 80,332 ufo sightings across the world
+                  from 1906 to 2014. Every sighting has the date and time, city,
+                  state, and country of the sighting. The sightings also have
+                  the encounter length, descritpion, date documented, and
+                  coordinates. The data set can be found
+                  <a
+                     target="_blank"
+                     href="https://github.com/rfordatascience/tidytuesday/tree/2e9bd5a67e09b14d01f616b00f7f7e0931515d24/data/2019/2019-06-25"
+                     >here</a
+                  >.
                </i>
             </div>
          </details>
@@ -126,12 +133,21 @@
          <details open>
             <summary><h2>Visualization Components</h2></summary>
             <div class="content">
-               <i>
-                  1 section on the visualization components: Explain each view
-                  of the data, the GUI, etc. Explain how you can interact with
-                  your application, and how the views update in response to
-                  these interactions.
-               </i>
+               <div class="vis-view">
+                  <h4>Timeline</h4>
+               </div>
+               <div class="vis-view">
+                  <h4>Map</h4>
+               </div>
+               <div class="vis-view">
+                  <h4>Frequency Bar Charts</h4>
+               </div>
+               <div class="vis-view">
+                  <h4>Histogram</h4>
+               </div>
+               <div class="vis-view">
+                  <h4>Word Cloud</h4>
+               </div>
             </div>
          </details>
       </section>
@@ -153,10 +169,12 @@
             <summary><h2>Discovery</h2></summary>
             <div class="content">
                <i>
-                  56.9% of all reported sightings occurred at night. The next highest being 23.4% in the evening.
-                  The most commonly reported UFO shape is light.
-                  Sightings are fairly well distributed by season, Fall: 27%, Winter 20%, Spring 20%, Summer 33%.
-                  The top 3 most used words in sighting descriptions are lights, light, and bright. 
+                  56.9% of all reported sightings occurred at night. The next
+                  highest being 23.4% in the evening. The most commonly reported
+                  UFO shape is light. Sightings are fairly well distributed by
+                  season, Fall: 27%, Winter 20%, Spring 20%, Summer 33%. The top
+                  3 most used words in sighting descriptions are lights, light,
+                  and bright.
                </i>
             </div>
          </details>
@@ -166,12 +184,113 @@
          <details open>
             <summary><h2>Process</h2></summary>
             <div class="content">
-               <i>
-                  1 section on your process- what libraries did you use? How did
-                  you structure your code? How can you access it and run it?
-                  Link to your code (and the live application, if it is deployed
-                  online).
-               </i>
+               <p>
+                  For libraries we used d3js, d3-cloud, and leaflet. d3 was
+                  mainly used in building the bar charts and allowed for
+                  brushing techniques. d3-cloud was specifically for generating
+                  the word cloud and similarly leaflet was used specifically for
+                  the map.
+               </p>
+
+               <div class="code-structure">
+                  <h4>Our code was structured in the following way:</h4>
+
+                  <div class="code-section">
+                     <div class="code-image-block">
+                        <p>
+                           First our main function collects all the data from
+                           the csv, processes said data, then initializes all
+                           the charts and event listeners.
+                        </p>
+                        <img src="./images/code/main.png" />
+                     </div>
+                     <div class="code-image-block">
+                        <p>
+                           The processData function loops over all the rawData
+                           from the csv and does some type casting and build
+                           some calculated fields like the totd, season, year,
+                           month, hour, and other fields we are interested in
+                           visualizing.
+                        </p>
+                        <img src="./images/code/data-processing.png" />
+                     </div>
+                     <div class="code-image-block">
+                        <p>
+                           The eventListeners in this case are for when the
+                           timeline is collapsed, the bar chart sections
+                           hideFrequencyCategoriesWithoutData toggle is changed,
+                           and when the clear selections button is clicked.
+                        </p>
+                        <img src="./images/code/event-listeners.png" />
+                     </div>
+
+                     <div class="code-image-block">
+                        <p>
+                           We also had a globals file that stored all global
+                           variables that would be shared across different chart
+                           types. These variables include the rawData from the
+                           csv, the processedData which is the rawData with
+                           calculated fields and type casting, then the actual
+                           data which is the filtered down version of the
+                           processedData based on brush selections.
+                        </p>
+                        <img src="./images/code/data-variables.png" />
+                     </div>
+
+                     <div class="code-image-block">
+                        <p>
+                           We also had global variables for all the chart
+                           instances. This makes it easier to access any chart
+                           from anywhere in the code and makes it especially
+                           easy to trigger updateVis method from other chart
+                           interactions.
+                        </p>
+                        <img src="./images/code/chart-variables.png" />
+                     </div>
+
+                     <div class="code-image-block">
+                        <p>
+                           Finally, there were also a few helper functions
+                           defined globally. The main two of note are the
+                           updateAllVis and handleGlobalFilterChange. These
+                           functions handle calling the updateVis/updateData on
+                           all the charts, and applying new filtering logic to
+                           the processedData to send to the chart instances on
+                           some brush selections or timeline change. Another
+                           interesting concept is debouncing the
+                           handleGlobalFilterChange. Because all the charts call
+                           this, making sure frequent potentially duplicated
+                           calls dont trigger unessecary processing, a debounce
+                           was implemented to basically wait 50ms after a call
+                           to this method is made and if no new call is made in
+                           that time it does the processing.
+                        </p>
+                        <img src="./images/code/helper-variables.png" />
+                     </div>
+                  </div>
+               </div>
+
+               <p>
+                  Of course there are lots of more interesting areas, such as
+                  the chart implementations themselves and how the timeline
+                  plays on a setInterval, but I will leave that for you to
+                  investigate in our sourcecode!
+               </p>
+               <br />
+               <p>
+                  You can access the source code
+                  <a
+                     target="_blank"
+                     href="https://github.com/ko-penn/Data-Visualizations-Project-2"
+                  >
+                     here
+                  </a>
+                  and run it simply in VSCode with the live preview extension on
+                  the index.html file. You can also see the live version
+                  <a target="_blank" href="https://cs5124project2.netlify.app/"
+                     >here</a
+                  >.
+               </p>
             </div>
          </details>
       </section>
